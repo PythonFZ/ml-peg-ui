@@ -78,9 +78,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NFR-2.1 | Phase 1 | Pending |
+| NFR-2.1 | Phase 1 | Complete |
 | NFR-2.2 | Phase 1 | Complete |
-| NFR-2.3 | Phase 1 | Pending |
+| NFR-2.3 | Phase 1 | Complete |
 | NFR-2.4 | Phase 1 | Complete |
 | NFR-3.1 | Phase 1 | Complete |
 | NFR-3.2 | Phase 1 | Complete |

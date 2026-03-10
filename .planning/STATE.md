@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 01-infrastructure/01-01-PLAN.md
-last_updated: "2026-03-10T20:56:44.935Z"
-last_activity: 2026-03-10 — Roadmap created, research complete
+status: executing
+stopped_at: Completed 01-infrastructure/01-02-PLAN.md
+last_updated: "2026-03-10T21:03:15.608Z"
+last_activity: "2026-03-10 — Plan 01-01 complete: monorepo scaffold with Python + Next.js config"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 50
 ---
 
@@ -26,28 +26,28 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 Phase: 1 of 5 (Infrastructure)
-Plan: 1 of 2 in current phase (01-01 complete)
-Status: In progress
-Last activity: 2026-03-10 — Plan 01-01 complete: monorepo scaffold with Python + Next.js config
+Plan: 2 of 2 in current phase (01-01 and 01-02 complete — Phase 1 done)
+Status: Phase 1 complete
+Last activity: 2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 12 min
-- Total execution time: 0.2 hours
+- Total plans completed: 2
+- Average duration: 7.5 min
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-infrastructure | 1 | 12min | 12min |
+| 01-infrastructure | 2 | 15min | 7.5min |
 
 **Recent Trend:**
-- Last 5 plans: 12min (01-01)
-- Trend: -
+- Last 5 plans: 12min (01-01), 3min (01-02)
+- Trend: Improving
 
 *Updated after each plan completion*
 
@@ -69,6 +69,9 @@ Recent decisions affecting current work:
 - [Phase 01-infrastructure]: minio-py over boto3 — boto3 is 82 MB vs minio 93 KB, mandatory for Vercel 100 MB bundle limit
 - [Phase 01-infrastructure]: uv.lock committed — required for reproducible Vercel Python builds
 - [Phase 01-infrastructure]: concurrently dev script — bun run dev starts next dev + uvicorn in parallel
+- [Phase 01-infrastructure]: Category/benchmark index built at lifespan startup and cached in app.state — avoids per-request filesystem scans
+- [Phase 01-infrastructure]: Lowercase slug_map (37conf8 -> conformers/37Conf8) handles PascalCase directory naming
+- [Phase 01-infrastructure]: Figure endpoint returns 501 stub — size-based redirect logic deferred to Phase 4
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T20:56:44.933Z
-Stopped at: Completed 01-infrastructure/01-01-PLAN.md
+Last session: 2026-03-10T21:03:15.606Z
+Stopped at: Completed 01-infrastructure/01-02-PLAN.md
 Resume file: None
