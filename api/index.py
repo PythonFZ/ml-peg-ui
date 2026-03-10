@@ -15,12 +15,20 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
-from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
-from fastapi.responses import ORJSONResponse
 
+from api.models import (
+    BenchmarkRow,
+    BenchmarkTableResponse,
+    CategoriesResponse,
+    CategoryItem,
+    HealthResponse,
+    Meta,
+    ModelEntry,
+    ModelsResponse,
+)
 from api.storage import StorageBackend, create_storage
 
 # Load local env overrides (no-op if absent)
@@ -106,34 +114,28 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     # Cleanup (nothing to close for filesystem backend)
 
 
-def envelope(data: Any, **meta: Any) -> dict:
-    """Wrap data in the standard API envelope.
-
-    Example: envelope([1, 2, 3], columns=["a"]) ->
-        {"data": [1, 2, 3], "meta": {"count": 3, "columns": ["a"]}}
-    """
-    count = len(data) if isinstance(data, list) else 1
-    return {"data": data, "meta": {"count": count, **meta}}
-
-
 router = APIRouter(prefix="/api/v1")
 
 
-@router.get("/health", response_class=ORJSONResponse)
-async def health() -> dict:
+@router.get("/health")
+async def health() -> HealthResponse:
     """Liveness check endpoint."""
-    return {"status": "ok"}
+    return HealthResponse(status="ok")
 
 
-@router.get("/categories", response_class=ORJSONResponse)
-async def categories(request: Request, response: Response) -> dict:
+@router.get("/categories")
+async def categories(request: Request, response: Response) -> CategoriesResponse:
     """Return all categories with embedded benchmark lists."""
     response.headers["Cache-Control"] = CACHE_HEADER
-    return envelope(request.app.state.categories)
+    cats = request.app.state.categories
+    return CategoriesResponse(
+        data=[CategoryItem.model_validate(c) for c in cats],
+        meta=Meta(count=len(cats)),
+    )
 
 
-@router.get("/benchmarks/{slug}/table", response_class=ORJSONResponse)
-async def benchmark_table(slug: str, request: Request, response: Response) -> dict:
+@router.get("/benchmarks/{slug}/table")
+async def benchmark_table(slug: str, request: Request, response: Response) -> BenchmarkTableResponse:
     """Return the metrics table for a specific benchmark.
 
     The slug is case-insensitive (e.g. '37conf8' maps to 'conformers/37Conf8').
@@ -156,12 +158,16 @@ async def benchmark_table(slug: str, request: Request, response: Response) -> di
     rows: list[dict] = payload.get("data", payload) if isinstance(payload, dict) else payload
     columns = list(rows[0].keys()) if rows else []
 
+    rows_validated = [BenchmarkRow.model_validate(r) for r in rows]
     response.headers["Cache-Control"] = CACHE_HEADER
-    return envelope(rows, columns=columns)
+    return BenchmarkTableResponse(
+        data=rows_validated,
+        meta=Meta(count=len(rows_validated), columns=columns),
+    )
 
 
-@router.get("/benchmarks/{slug}/figures/{figure_slug}", response_class=ORJSONResponse)
-async def benchmark_figure(slug: str, figure_slug: str) -> dict:
+@router.get("/benchmarks/{slug}/figures/{figure_slug}")
+async def benchmark_figure(slug: str, figure_slug: str):
     """Return figure data for a specific benchmark figure.
 
     NOTE: Full implementation deferred — requires size-based decision logic
@@ -177,15 +183,16 @@ async def benchmark_figure(slug: str, figure_slug: str) -> dict:
     )
 
 
-@router.get("/models", response_class=ORJSONResponse)
-async def models(request: Request, response: Response) -> dict:
+@router.get("/models")
+async def models(request: Request, response: Response) -> ModelsResponse:
     """Return all unique models derived from all benchmark metrics tables.
 
     Results are cached after the first request.
     """
     if request.app.state.models_cache is not None:
         response.headers["Cache-Control"] = CACHE_HEADER
-        return envelope(request.app.state.models_cache)
+        model_entries = [ModelEntry.model_validate(m) for m in request.app.state.models_cache]
+        return ModelsResponse(data=model_entries, meta=Meta(count=len(model_entries)))
 
     storage: StorageBackend = request.app.state.storage
     slug_map: dict[str, str] = request.app.state.slug_map
@@ -216,14 +223,14 @@ async def models(request: Request, response: Response) -> dict:
     request.app.state.models_cache = model_list
 
     response.headers["Cache-Control"] = CACHE_HEADER
-    return envelope(model_list)
+    model_entries = [ModelEntry.model_validate(m) for m in model_list]
+    return ModelsResponse(data=model_entries, meta=Meta(count=len(model_entries)))
 
 
 # Build the FastAPI application
 app = FastAPI(
     title="ML-PEG Benchmark API",
     version="0.1.0",
-    default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
 app.include_router(router)
