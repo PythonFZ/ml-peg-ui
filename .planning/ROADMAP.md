@@ -13,7 +13,7 @@ Five phases transform an empty repo into a production-grade scientific benchmark
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure** - Vercel deployment + FastAPI skeleton + MinIO data pipeline (completed 2026-03-10)
-- [ ] **Phase 01.1: Replace ORJSONResponse with Pydantic response models** (INSERTED)
+- [x] **Phase 01.1: Replace ORJSONResponse with Pydantic response models** (INSERTED) (completed 2026-03-10)
 - [ ] **Phase 2: Leaderboard Core** - Color-coded MUI DataGrid with category navigation and CDN caching
 - [ ] **Phase 3: Figure Drawer** - Cell-click Plotly drawer with lazy loading and presigned URL redirect
 - [ ] **Phase 4: Secondary Viewers** - Diatomic curve, 3D structure, NEB trajectory, and phonon viewers
@@ -42,7 +42,7 @@ Plans:
 **Goal:** Replace all ORJSONResponse usage with typed Pydantic response models, remove orjson dependency, and modernize the API to use FastAPI's native Pydantic serialization
 **Requirements**: PYDANTIC-01, PYDANTIC-02
 **Depends on:** Phase 1
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 01.1-01-PLAN.md — Pydantic response models, endpoint refactor, orjson removal, test updates
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure | 2/2 | Complete   | 2026-03-10 |
-| 01.1. Pydantic Response Models | 0/1 | Not started | - |
+| 01.1. Pydantic Response Models | 1/1 | Complete   | 2026-03-10 |
 | 2. Leaderboard Core | 0/? | Not started | - |
 | 3. Figure Drawer | 0/? | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |

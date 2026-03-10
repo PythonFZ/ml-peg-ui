@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 01.1 context gathered
-last_updated: "2026-03-10T21:23:42.600Z"
+stopped_at: Completed 01.1-replace-orjsonresponse-with-pydantic-response-models/01.1-01-PLAN.md
+last_updated: "2026-03-10T21:39:30.757Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 100
 ---
 
@@ -50,6 +50,7 @@ Progress: [██████████] 100%
 - Trend: Improving
 
 *Updated after each plan completion*
+| Phase 01.1-replace-orjsonresponse-with-pydantic-response-models P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase 01-infrastructure]: Category/benchmark index built at lifespan startup and cached in app.state — avoids per-request filesystem scans
 - [Phase 01-infrastructure]: Lowercase slug_map (37conf8 -> conformers/37Conf8) handles PascalCase directory naming
 - [Phase 01-infrastructure]: Figure endpoint returns 501 stub — size-based redirect logic deferred to Phase 4
+- [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Used return type annotations (not response_model=) to preserve BenchmarkRow extra fields
+- [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Kept models_cache as list[dict] in app.state — validated on return, not on cache write
+- [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: envelope() helper removed entirely — Meta model serves same role, type-safely
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T21:23:42.598Z
-Stopped at: Phase 01.1 context gathered
-Resume file: .planning/phases/01.1-replace-orjsonresponse-with-pydantic-response-models/01.1-CONTEXT.md
+Last session: 2026-03-10T21:39:30.755Z
+Stopped at: Completed 01.1-replace-orjsonresponse-with-pydantic-response-models/01.1-01-PLAN.md
+Resume file: None
