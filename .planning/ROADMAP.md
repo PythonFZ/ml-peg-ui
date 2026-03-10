@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `GET /api/v1/models` and `GET /api/v1/benchmarks` return real data fetched from MinIO
   4. Vercel deployment succeeds with Python bundle under 100 MB (`data/` excluded from bundle)
   5. A Next.js page at `/` renders without errors (placeholder content acceptable)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 01-01-PLAN.md — Project scaffolding: pyproject.toml, Next.js app, Vercel config, TS types, test framework
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure | 0/2 | Planning complete | - |
+| 1. Infrastructure | 1/2 | In Progress|  |
 | 2. Leaderboard Core | 0/? | Not started | - |
 | 3. Figure Drawer | 0/? | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |
