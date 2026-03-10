@@ -13,6 +13,7 @@ Five phases transform an empty repo into a production-grade scientific benchmark
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure** - Vercel deployment + FastAPI skeleton + MinIO data pipeline (completed 2026-03-10)
+- [ ] **Phase 01.1: Replace ORJSONResponse with Pydantic response models** (INSERTED)
 - [ ] **Phase 2: Leaderboard Core** - Color-coded MUI DataGrid with category navigation and CDN caching
 - [ ] **Phase 3: Figure Drawer** - Cell-click Plotly drawer with lazy loading and presigned URL redirect
 - [ ] **Phase 4: Secondary Viewers** - Diatomic curve, 3D structure, NEB trajectory, and phonon viewers
@@ -33,8 +34,18 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffolding: pyproject.toml, Next.js app, Vercel config, TS types, test framework
-- [ ] 01-02-PLAN.md — Storage abstraction + FastAPI endpoints + comprehensive tests
+- [x] 01-01-PLAN.md — Project scaffolding: pyproject.toml, Next.js app, Vercel config, TS types, test framework
+- [x] 01-02-PLAN.md — Storage abstraction + FastAPI endpoints + comprehensive tests
+
+### Phase 01.1: Replace ORJSONResponse with Pydantic response models (INSERTED)
+
+**Goal:** Replace all ORJSONResponse usage with typed Pydantic response models, remove orjson dependency, and modernize the API to use FastAPI's native Pydantic serialization
+**Requirements**: PYDANTIC-01, PYDANTIC-02
+**Depends on:** Phase 1
+**Plans:** 1 plan
+
+Plans:
+- [ ] 01.1-01-PLAN.md — Pydantic response models, endpoint refactor, orjson removal, test updates
 
 ### Phase 2: Leaderboard Core
 **Goal**: Researchers can browse benchmark scores for all models in a fast, color-coded leaderboard table
@@ -86,11 +97,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure | 2/2 | Complete   | 2026-03-10 |
+| 01.1. Pydantic Response Models | 0/1 | Not started | - |
 | 2. Leaderboard Core | 0/? | Not started | - |
 | 3. Figure Drawer | 0/? | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |
