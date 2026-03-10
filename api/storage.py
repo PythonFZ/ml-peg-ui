@@ -12,7 +12,7 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-import orjson
+import json
 
 
 @runtime_checkable
@@ -42,11 +42,11 @@ class FilesystemBackend:
         self._base = Path(base_path)
 
     def get_json(self, path: str) -> dict:
-        """Read and parse a JSON file from base_path/path using orjson."""
+        """Read and parse a JSON file from base_path/path."""
         full_path = self._base / path
         if not full_path.exists():
             raise FileNotFoundError(f"No such file: {full_path}")
-        return orjson.loads(full_path.read_bytes())
+        return json.loads(full_path.read_bytes())
 
     def list_keys(self, prefix: str) -> list[str]:
         """List all files and directories under base_path/prefix.
@@ -102,7 +102,7 @@ class MinioBackend:
         """Fetch an object from MinIO and parse it as JSON."""
         response = self.client.get_object(self.bucket, self._key(path))
         try:
-            return orjson.loads(response.read())
+            return json.loads(response.read())
         finally:
             response.close()
             response.release_conn()
