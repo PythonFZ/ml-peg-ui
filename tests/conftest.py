@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from starlette.testclient import TestClient
 
 
 @pytest.fixture
@@ -29,4 +30,14 @@ def tmp_data_dir(tmp_path: Path) -> Path:
     return tmp_path
 
 
-# NOTE: TestClient fixtures will be added in Plan 02 when api/index.py exists.
+@pytest.fixture(scope="session")
+def test_client() -> TestClient:
+    """Provide a TestClient for the FastAPI app.
+
+    Uses the real data/ directory so endpoint tests exercise actual data paths.
+    Session-scoped so the lifespan runs once for all tests in the session.
+    """
+    from api.index import app
+
+    with TestClient(app) as client:
+        yield client
