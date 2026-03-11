@@ -13,6 +13,7 @@ interface LeaderboardTableProps {
   rows: MetricsRow[];
   meta: BenchmarkMeta;
   onCellClick?: (benchmarkSlug: string, modelName: string) => void;
+  onColumnHeaderClick?: (benchmarkSlug: string) => void;
   activeBenchmarkSlug?: string;
   slugsWithFigures?: Set<string> | null;
 }
@@ -42,6 +43,7 @@ export default function LeaderboardTable({
   rows,
   meta,
   onCellClick,
+  onColumnHeaderClick,
   activeBenchmarkSlug,
   slugsWithFigures,
 }: LeaderboardTableProps) {
@@ -189,7 +191,7 @@ export default function LeaderboardTable({
         initialState={{
           pagination: { paginationModel: { pageSize: 100 } },
         }}
-        onCellClick={(params) => {
+        onCellClick={(params, event) => {
           if (!isClickable) return;
           if (
             params.field === 'MLIP' ||
@@ -197,7 +199,14 @@ export default function LeaderboardTable({
             params.field === '__check__'
           )
             return;
+          event.stopPropagation();
           onCellClick?.(activeBenchmarkSlug ?? '', params.row.MLIP);
+        }}
+        onColumnHeaderClick={(params, event) => {
+          if (!isClickable) return;
+          if (params.field === 'MLIP' || params.field === 'id' || params.field === '__check__') return;
+          event.stopPropagation();
+          onColumnHeaderClick?.(activeBenchmarkSlug ?? '');
         }}
       />
     </Box>

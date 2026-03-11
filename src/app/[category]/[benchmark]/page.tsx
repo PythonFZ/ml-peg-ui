@@ -26,15 +26,26 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
     open: boolean;
     benchmarkSlug: string;
     benchmarkName: string;
-    modelName: string;
-  }>({ open: false, benchmarkSlug: '', benchmarkName: '', modelName: '' });
+    filterModel: string | null; // null = all models (column click), string = single model (cell click)
+  }>({ open: false, benchmarkSlug: '', benchmarkName: '', filterModel: null });
 
   const handleCellClick = useCallback(
     (benchmarkSlug: string, modelName: string) => {
-      setDrawerState({ open: true, benchmarkSlug, benchmarkName: benchmark, modelName });
+      setDrawerState({ open: true, benchmarkSlug, benchmarkName: benchmark, filterModel: modelName });
     },
     [benchmark]
   );
+
+  const handleColumnHeaderClick = useCallback(
+    (benchmarkSlug: string) => {
+      setDrawerState({ open: true, benchmarkSlug, benchmarkName: benchmark, filterModel: null });
+    },
+    [benchmark]
+  );
+
+  const handlePageClick = useCallback(() => {
+    setDrawerState((prev) => (prev.open ? { ...prev, open: false } : prev));
+  }, []);
 
   if (isLoading) {
     return <TableSkeleton />;
@@ -59,11 +70,12 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
+    <Box sx={{ width: '100%', height: '100%' }} onClick={handlePageClick}>
       <LeaderboardTable
         rows={tableData}
         meta={meta}
         onCellClick={handleCellClick}
+        onColumnHeaderClick={handleColumnHeaderClick}
         activeBenchmarkSlug={benchmark}
         slugsWithFigures={slugsWithFigures}
       />
@@ -72,7 +84,7 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
         onClose={() => setDrawerState((prev) => ({ ...prev, open: false }))}
         benchmarkSlug={drawerState.benchmarkSlug}
         benchmarkName={drawerState.benchmarkName}
-        modelName={drawerState.modelName}
+        filterModel={drawerState.filterModel}
       />
     </Box>
   );
