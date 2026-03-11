@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import type { ApiEnvelope, Category, MetricsRow } from './types';
+import type { ApiEnvelope, BenchmarkTableResponse, Category } from './types';
 
 export const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -17,7 +17,7 @@ export function useCategories() {
 }
 
 export function useBenchmarkTable(slug: string | null) {
-  const { data, isLoading, error } = useSWR<ApiEnvelope<MetricsRow[]>>(
+  const { data, isLoading, error } = useSWR<BenchmarkTableResponse>(
     slug ? `/api/v1/benchmarks/${slug}/table` : null,
     fetcher,
     { revalidateOnFocus: false }
