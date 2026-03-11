@@ -58,7 +58,13 @@ Plans:
   4. The page fully loads in under 2 seconds on broadband; table re-renders after sort in under 100ms
   5. Dark and light mode toggle works with no SSR flash; preference persists across page reloads
   6. GitHub links to model repos and benchmark sources are present and correct; URLs are deep-linkable per category
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Extend benchmark table API with thresholds, tooltips, weights; update TS types
+- [ ] 02-02-PLAN.md — Install MUI, wire dark/light mode, create app shell with category/benchmark tabs
+- [ ] 02-03-PLAN.md — Build LeaderboardTable with viridis_r heatmap, sticky columns, GitHub links
+- [ ] 02-04-PLAN.md — Summary table, App Router pages, deep-linkable URLs, final verification
 
 ### Phase 3: Figure Drawer
 **Goal**: Clicking any data cell opens a Plotly chart in a drawer, with large figures handled via presigned redirect
@@ -103,7 +109,7 @@ Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Infrastructure | 2/2 | Complete   | 2026-03-10 |
 | 01.1. Pydantic Response Models | 1/1 | Complete    | 2026-03-10 |
-| 2. Leaderboard Core | 0/? | Not started | - |
+| 2. Leaderboard Core | 0/4 | Planned | - |
 | 3. Figure Drawer | 0/? | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |
 | 5. UX Polish | 0/? | Not started | - |
