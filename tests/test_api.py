@@ -7,6 +7,8 @@ from starlette.testclient import TestClient
 from api.models import (
     BenchmarkTableResponse,
     CategoriesResponse,
+    FigureItem,
+    FigureListResponse,
     HealthResponse,
     ModelsResponse,
 )
@@ -156,6 +158,54 @@ def test_benchmark_table_columns_structured(test_client: TestClient) -> None:
     first_col = columns[0]
     assert "name" in first_col, f"Column descriptor missing 'name': {first_col}"
     assert "id" in first_col, f"Column descriptor missing 'id': {first_col}"
+
+
+def test_get_object_size_returns_positive_int() -> None:
+    """FilesystemBackend.get_object_size returns a positive int for an existing file."""
+    from api.storage import FilesystemBackend
+
+    backend = FilesystemBackend(base_path="data")
+    size = backend.get_object_size("conformers/37Conf8/figure_37conf8.json")
+    assert isinstance(size, int), f"Expected int, got {type(size)}"
+    assert size > 0, f"Expected positive file size, got {size}"
+
+
+def test_get_object_size_raises_file_not_found() -> None:
+    """FilesystemBackend.get_object_size raises FileNotFoundError for missing file."""
+    from api.storage import FilesystemBackend
+
+    backend = FilesystemBackend(base_path="data")
+    with pytest.raises(FileNotFoundError):
+        backend.get_object_size("nonexistent/path/file.json")
+
+
+def test_figure_item_model_validates() -> None:
+    """FigureItem validates {slug, name}."""
+    item = FigureItem.model_validate({"slug": "37conf8", "name": "37conf8"})
+    assert item.slug == "37conf8"
+    assert item.name == "37conf8"
+
+
+def test_figure_list_response_validates() -> None:
+    """FigureListResponse validates {data: [...], meta: {count: 1}}."""
+    from api.models import Meta
+
+    response = FigureListResponse.model_validate({
+        "data": [{"slug": "37conf8", "name": "37conf8"}],
+        "meta": {"count": 1},
+    })
+    assert len(response.data) == 1
+    assert response.meta.count == 1
+
+
+def test_figure_response_validates() -> None:
+    """FigureResponse validates {data: {plotly dict}}."""
+    from api.models import FigureResponse
+
+    response = FigureResponse.model_validate({
+        "data": {"data": [], "layout": {}}
+    })
+    assert isinstance(response.data, dict)
 
 
 def test_benchmark_table_cache_headers(test_client: TestClient) -> None:
