@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { getInitColorSchemeScript } from '@mui/material/styles';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: "ML-PEG Leaderboard",
@@ -11,8 +14,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        {getInitColorSchemeScript()}
+        <AppRouterCacheProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </AppRouterCacheProvider>
+      </body>
     </html>
   );
 }
