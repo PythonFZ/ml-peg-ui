@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-10T22:12:19.483Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-11T06:50:25.521Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 7
+  completed_plans: 4
   percent: 100
 ---
 
@@ -51,6 +51,7 @@ Progress: [██████████] 100%
 
 *Updated after each plan completion*
 | Phase 01.1-replace-orjsonresponse-with-pydantic-response-models P01 | 3 | 2 tasks | 7 files |
+| Phase 02-leaderboard-core P02 | 2 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Used return type annotations (not response_model=) to preserve BenchmarkRow extra fields
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Kept models_cache as list[dict] in app.state — validated on return, not on cache write
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: envelope() helper removed entirely — Meta model serves same role, type-safely
+- [Phase 02-leaderboard-core]: MUI cssVariables: true eliminates SSR flash without next-themes — built-in MUI mechanism
+- [Phase 02-leaderboard-core]: getInitColorSchemeScript() renders before providers to block hydration mismatch
+- [Phase 02-leaderboard-core]: SWR revalidateOnFocus: false prevents unnecessary refetch on tab switch
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T22:12:19.480Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-leaderboard-core/02-CONTEXT.md
+Last session: 2026-03-11T06:50:25.519Z
+Stopped at: Completed 02-02-PLAN.md
+Resume file: None
