@@ -89,3 +89,23 @@ class ModelEntry(BaseModel):
 class ModelsResponse(BaseModel):
     data: list[ModelEntry]
     meta: Meta
+
+
+class FigureItem(BaseModel):
+    """A single figure entry with slug and display name."""
+
+    slug: str
+    name: str
+
+
+class FigureListResponse(BaseModel):
+    """Response for the figures index endpoint."""
+
+    data: list[FigureItem]
+    meta: Meta
+
+
+class FigureResponse(BaseModel):
+    """Response for the figure detail endpoint (inline Plotly JSON)."""
+
+    data: dict

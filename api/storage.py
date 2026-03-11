@@ -31,6 +31,13 @@ class StorageBackend(Protocol):
         """Return a presigned URL for the given path (production only)."""
         ...
 
+    def get_object_size(self, path: str) -> int:
+        """Return the size in bytes of the object at the given path.
+
+        Raises FileNotFoundError if the object does not exist.
+        """
+        ...
+
 
 class FilesystemBackend:
     """Reads benchmark data from the local data/ directory.
@@ -61,6 +68,16 @@ class FilesystemBackend:
     def presigned_url(self, path: str) -> str:
         """Not available in filesystem mode."""
         raise NotImplementedError("Presigned URLs not available in filesystem mode")
+
+    def get_object_size(self, path: str) -> int:
+        """Return the file size in bytes for the given path.
+
+        Raises FileNotFoundError if the file does not exist.
+        """
+        full_path = self._base / path
+        if not full_path.exists():
+            raise FileNotFoundError(f"No such file: {full_path}")
+        return full_path.stat().st_size
 
 
 class MinioBackend:
@@ -123,6 +140,14 @@ class MinioBackend:
             self._key(path),
             expires=timedelta(hours=expires_hours),
         )
+
+    def get_object_size(self, path: str) -> int:
+        """Return the size in bytes of the object at the given path.
+
+        Raises FileNotFoundError if the object does not exist.
+        """
+        stat = self.client.stat_object(self.bucket, self._key(path))
+        return stat.size
 
 
 def create_storage() -> StorageBackend:
