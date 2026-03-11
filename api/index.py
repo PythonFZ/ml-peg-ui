@@ -18,6 +18,7 @@ from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
+from fastapi.responses import RedirectResponse
 
 from api.models import (
     BenchmarkMeta,
@@ -27,6 +28,9 @@ from api.models import (
     CategoryItem,
     ColumnDescriptor,
     ColumnTooltip,
+    FigureItem,
+    FigureListResponse,
+    FigureResponse,
     HealthResponse,
     Meta,
     ModelEntry,
@@ -190,21 +194,64 @@ async def benchmark_table(slug: str, request: Request, response: Response) -> Be
     )
 
 
+@router.get("/benchmarks/{slug}/figures")
+async def benchmark_figures_index(slug: str, request: Request, response: Response) -> FigureListResponse:
+    """Return a list of available figure slugs for the given benchmark.
+
+    Returns 404 if the benchmark slug is not found.
+    Returns an empty list if the benchmark has no figures.
+    """
+    slug_map: dict[str, str] = request.app.state.slug_map
+    storage: StorageBackend = request.app.state.storage
+
+    bench_path = slug_map.get(slug.lower())
+    if bench_path is None:
+        raise HTTPException(status_code=404, detail=f"Benchmark '{slug}' not found")
+
+    all_keys = storage.list_keys(bench_path)
+    figure_items: list[FigureItem] = []
+    for key in all_keys:
+        # Figure files are named figure_{slug}.json
+        if key.startswith("figure_") and key.endswith(".json"):
+            figure_slug = key[len("figure_"):-len(".json")]
+            figure_items.append(FigureItem(slug=figure_slug, name=figure_slug))
+
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return FigureListResponse(data=figure_items, meta=Meta(count=len(figure_items)))
+
+
+_FIGURE_SIZE_LIMIT = 4 * 1024 * 1024  # 4 MB
+
+
 @router.get("/benchmarks/{slug}/figures/{figure_slug}")
-async def benchmark_figure(slug: str, figure_slug: str):
+async def benchmark_figure(slug: str, figure_slug: str, request: Request, response: Response):
     """Return figure data for a specific benchmark figure.
 
-    NOTE: Full implementation deferred — requires size-based decision logic
-    (307 redirect vs inline JSON depends on file size). Returns 501 for now.
+    For files exceeding 4 MB, returns a 307 redirect to a presigned URL.
+    Otherwise, returns the Plotly JSON payload inline.
+    Returns 404 if benchmark slug or figure slug is not found.
     """
-    raise HTTPException(
-        status_code=501,
-        detail=(
-            f"Figure endpoint not yet implemented. "
-            f"Benchmark: '{slug}', Figure: '{figure_slug}'. "
-            "Will be implemented in a future phase."
-        ),
-    )
+    slug_map: dict[str, str] = request.app.state.slug_map
+    storage: StorageBackend = request.app.state.storage
+
+    bench_path = slug_map.get(slug.lower())
+    if bench_path is None:
+        raise HTTPException(status_code=404, detail=f"Benchmark '{slug}' not found")
+
+    figure_file = f"{bench_path}/figure_{figure_slug}.json"
+
+    try:
+        size = storage.get_object_size(figure_file)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Figure '{figure_slug}' not found for benchmark '{slug}'")
+
+    if size > _FIGURE_SIZE_LIMIT:
+        url = storage.presigned_url(figure_file)
+        return RedirectResponse(url=url, status_code=307)
+
+    payload = storage.get_json(figure_file)
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return FigureResponse(data=payload)
 
 
 @router.get("/models")
