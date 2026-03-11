@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Checkpoint 03-02 Task 3: human-verify figure drawer"
-last_updated: "2026-03-11T08:23:52.163Z"
+stopped_at: Completed 03-02-PLAN.md — figure drawer frontend
+last_updated: "2026-03-11T09:56:38.219Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 02-leaderboard-core P02 | 2 | 2 tasks | 8 files |
 | Phase 03-figure-drawer P01 | 3 | 2 tasks | 4 files |
 | Phase 03-figure-drawer P02 | 4 | 2 tasks | 9 files |
+| Phase 03-figure-drawer P02 | 10 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 03-figure-drawer]: figures index uses storage.list_keys() + figure_*.json filter — reuses existing storage abstraction without new methods
 - [Phase 03-figure-drawer]: Use extendTheme instead of createTheme for MUI v7 CSS variables API (colorSchemeSelector support)
 - [Phase 03-figure-drawer]: PlotlyChart imported ONLY via next/dynamic to keep Plotly bundle out of initial page JS
+- [Phase 03-figure-drawer]: Persistent MUI Drawer variant enables swap-in-place figure switching without close/reopen animation
+- [Phase 03-figure-drawer]: filterModel null=all-models (header click) string=single-model (cell click) — parity with ml-peg dual patterns
+- [Phase 03-figure-drawer]: scattergl downgraded to scatter — plotly-basic-dist-min excludes WebGL scatter support
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T08:23:52.160Z
-Stopped at: Checkpoint 03-02 Task 3: human-verify figure drawer
+Last session: 2026-03-11T09:56:38.217Z
+Stopped at: Completed 03-02-PLAN.md — figure drawer frontend
 Resume file: None
