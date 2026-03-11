@@ -105,10 +105,58 @@ def test_envelope_shape(test_client: TestClient) -> None:
         )
 
 
-def test_figure_stub(test_client: TestClient) -> None:
-    """GET /api/v1/benchmarks/{slug}/figures/{figure} returns 501 (not yet implemented)."""
+def test_benchmark_figures_index(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/figures returns 200 with figure list."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/figures")
+    assert response.status_code == 200
+    body = FigureListResponse.model_validate(response.json())
+    assert len(body.data) >= 1, "Expected at least one figure for 37conf8"
+    assert body.meta.count == len(body.data)
+    for item in body.data:
+        assert item.slug, f"FigureItem missing slug: {item}"
+        assert item.name, f"FigureItem missing name: {item}"
+
+
+def test_benchmark_figures_index_404(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/nonexistent/figures returns 404."""
+    response = test_client.get("/api/v1/benchmarks/nonexistent/figures")
+    assert response.status_code == 404
+
+
+def test_benchmark_figure_json(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/figures/37conf8 returns 200 with Plotly JSON."""
     response = test_client.get("/api/v1/benchmarks/37conf8/figures/37conf8")
-    assert response.status_code == 501
+    assert response.status_code == 200
+    body = response.json()
+    assert "data" in body, "Response missing 'data' key"
+    assert isinstance(body["data"], dict), "Expected 'data' to be a dict (Plotly payload)"
+    # Plotly JSON has a top-level 'data' key with trace list
+    assert "data" in body["data"], "Plotly payload missing 'data' key (traces array)"
+
+
+def test_benchmark_figure_404(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/figures/nonexistent_figure returns 404."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/figures/nonexistent_figure")
+    assert response.status_code == 404
+
+
+def test_benchmark_figures_empty(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/phonons/figures returns 200 with empty data and count 0."""
+    response = test_client.get("/api/v1/benchmarks/phonons/figures")
+    assert response.status_code == 200
+    body = FigureListResponse.model_validate(response.json())
+    assert body.data == [], f"Expected empty figures list for phonons, got {body.data}"
+    assert body.meta.count == 0
+
+
+def test_benchmark_figure_cache_headers(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/figures/37conf8 includes Cache-Control header."""
+    from api.index import CACHE_HEADER
+
+    response = test_client.get("/api/v1/benchmarks/37conf8/figures/37conf8")
+    assert response.status_code == 200
+    assert "cache-control" in response.headers, "Response missing Cache-Control header"
+    assert response.headers["cache-control"] == CACHE_HEADER
 
 
 def test_benchmark_table_thresholds(test_client: TestClient) -> None:
