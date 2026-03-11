@@ -104,11 +104,11 @@
 | NFR-4.1 | Phase 2 | Pending |
 | NFR-4.2 | Phase 2 | Pending |
 | NFR-4.3 | Phase 2 | Complete |
-| FR-3.1 | Phase 3 | Pending |
-| FR-3.2 | Phase 3 | Pending |
-| FR-3.3 | Phase 3 | Pending |
-| FR-3.4 | Phase 3 | Pending |
-| NFR-1.4 | Phase 3 | Pending |
+| FR-3.1 | Phase 3 | Complete |
+| FR-3.2 | Phase 3 | Complete |
+| FR-3.3 | Phase 3 | Complete |
+| FR-3.4 | Phase 3 | Complete |
+| NFR-1.4 | Phase 3 | Complete |
 | FR-6.1 | Phase 4 | Pending |
 | FR-6.2 | Phase 4 | Pending |
 | FR-6.3 | Phase 4 | Pending |

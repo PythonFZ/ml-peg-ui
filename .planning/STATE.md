@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 03-01-PLAN.md — figure backend endpoints
-last_updated: "2026-03-11T08:17:11.953Z"
+stopped_at: "Checkpoint 03-02 Task 3: human-verify figure drawer"
+last_updated: "2026-03-11T08:23:52.163Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 100
 ---
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 | Phase 01.1-replace-orjsonresponse-with-pydantic-response-models P01 | 3 | 2 tasks | 7 files |
 | Phase 02-leaderboard-core P02 | 2 | 2 tasks | 8 files |
 | Phase 03-figure-drawer P01 | 3 | 2 tasks | 4 files |
+| Phase 03-figure-drawer P02 | 4 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 03-figure-drawer]: 4 MB threshold for 307 redirect — figure files under 4 MB served inline; larger files redirect to presigned URL
 - [Phase 03-figure-drawer]: Figure slug derived from filename by stripping figure_ prefix and .json suffix — no separate metadata file needed
 - [Phase 03-figure-drawer]: figures index uses storage.list_keys() + figure_*.json filter — reuses existing storage abstraction without new methods
+- [Phase 03-figure-drawer]: Use extendTheme instead of createTheme for MUI v7 CSS variables API (colorSchemeSelector support)
+- [Phase 03-figure-drawer]: PlotlyChart imported ONLY via next/dynamic to keep Plotly bundle out of initial page JS
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T08:17:11.950Z
-Stopped at: Completed 03-01-PLAN.md — figure backend endpoints
+Last session: 2026-03-11T08:23:52.160Z
+Stopped at: Checkpoint 03-02 Task 3: human-verify figure drawer
 Resume file: None
