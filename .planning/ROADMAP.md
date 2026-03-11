@@ -76,7 +76,11 @@ Plans:
   3. Density scatter, violin, parity, and confusion matrix figure types all render correctly
   4. Figures larger than 4 MB (bulk_density, shear_density) load successfully via 307 presigned URL redirect without hitting Vercel's 4.5 MB limit
   5. Charts render correctly in both dark and light mode
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Backend figure endpoints: figures index, figure detail with 307 redirect, storage get_object_size
+- [ ] 03-02-PLAN.md — Frontend FigureDrawer with lazy Plotly, cell-click wiring, dark/light theming
 
 ### Phase 4: Secondary Viewers
 **Goal**: Researchers can explore diatomic curves, atomic structures, NEB trajectories, and phonon data from within the UI
@@ -110,6 +114,6 @@ Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 | 1. Infrastructure | 2/2 | Complete   | 2026-03-10 |
 | 01.1. Pydantic Response Models | 1/1 | Complete    | 2026-03-10 |
 | 2. Leaderboard Core | 1/4 | In Progress | - |
-| 3. Figure Drawer | 0/? | Not started | - |
+| 3. Figure Drawer | 0/2 | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |
 | 5. UX Polish | 0/? | Not started | - |
