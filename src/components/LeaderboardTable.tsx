@@ -12,6 +12,9 @@ import { MODEL_LINKS } from '@/lib/model-links';
 interface LeaderboardTableProps {
   rows: MetricsRow[];
   meta: BenchmarkMeta;
+  onCellClick?: (benchmarkSlug: string, modelName: string) => void;
+  activeBenchmarkSlug?: string;
+  slugsWithFigures?: Set<string> | null;
 }
 
 const MLIP_WIDTH = 180;
@@ -35,7 +38,17 @@ function HatchedCell() {
   );
 }
 
-export default function LeaderboardTable({ rows, meta }: LeaderboardTableProps) {
+export default function LeaderboardTable({
+  rows,
+  meta,
+  onCellClick,
+  activeBenchmarkSlug,
+  slugsWithFigures,
+}: LeaderboardTableProps) {
+  const isClickable = Boolean(
+    slugsWithFigures?.has(activeBenchmarkSlug ?? '')
+  );
+
   const columns: GridColDef[] = useMemo(() => {
     const mlipCol: GridColDef = {
       field: 'MLIP',
@@ -156,6 +169,10 @@ export default function LeaderboardTable({ rows, meta }: LeaderboardTableProps) 
         // Remove cell padding to allow colored cells to fill completely
         '& .MuiDataGrid-cell': {
           padding: 0,
+          cursor: isClickable ? 'pointer' : 'default',
+          ...(isClickable && {
+            '&:hover': { filter: 'brightness(0.92)' },
+          }),
         },
       }}
     >
@@ -171,6 +188,16 @@ export default function LeaderboardTable({ rows, meta }: LeaderboardTableProps) 
         pageSizeOptions={[25, 50, 100]}
         initialState={{
           pagination: { paginationModel: { pageSize: 100 } },
+        }}
+        onCellClick={(params) => {
+          if (!isClickable) return;
+          if (
+            params.field === 'MLIP' ||
+            params.field === 'id' ||
+            params.field === '__check__'
+          )
+            return;
+          onCellClick?.(activeBenchmarkSlug ?? '', params.row.MLIP);
         }}
       />
     </Box>

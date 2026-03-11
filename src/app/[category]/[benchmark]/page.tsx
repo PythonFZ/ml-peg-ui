@@ -1,10 +1,11 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState, useCallback, useMemo } from 'react';
 import { Box, Typography } from '@mui/material';
 import LeaderboardTable from '@/components/LeaderboardTable';
 import TableSkeleton from '@/components/TableSkeleton';
-import { useBenchmarkTable } from '@/lib/api';
+import FigureDrawer from '@/components/FigureDrawer';
+import { useBenchmarkTable, useBenchmarkFigures } from '@/lib/api';
 
 interface BenchmarkPageProps {
   params: Promise<{ category: string; benchmark: string }>;
@@ -13,6 +14,27 @@ interface BenchmarkPageProps {
 export default function BenchmarkPage({ params }: BenchmarkPageProps) {
   const { benchmark } = use(params);
   const { tableData, meta, isLoading, error } = useBenchmarkTable(benchmark);
+  const { figures: figureList } = useBenchmarkFigures(benchmark);
+
+  const hasFigures = figureList.length > 0;
+  const slugsWithFigures = useMemo(
+    () => (hasFigures ? new Set([benchmark]) : new Set<string>()),
+    [benchmark, hasFigures]
+  );
+
+  const [drawerState, setDrawerState] = useState<{
+    open: boolean;
+    benchmarkSlug: string;
+    benchmarkName: string;
+    modelName: string;
+  }>({ open: false, benchmarkSlug: '', benchmarkName: '', modelName: '' });
+
+  const handleCellClick = useCallback(
+    (benchmarkSlug: string, modelName: string) => {
+      setDrawerState({ open: true, benchmarkSlug, benchmarkName: benchmark, modelName });
+    },
+    [benchmark]
+  );
 
   if (isLoading) {
     return <TableSkeleton />;
@@ -38,7 +60,20 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
 
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
-      <LeaderboardTable rows={tableData} meta={meta} />
+      <LeaderboardTable
+        rows={tableData}
+        meta={meta}
+        onCellClick={handleCellClick}
+        activeBenchmarkSlug={benchmark}
+        slugsWithFigures={slugsWithFigures}
+      />
+      <FigureDrawer
+        open={drawerState.open}
+        onClose={() => setDrawerState((prev) => ({ ...prev, open: false }))}
+        benchmarkSlug={drawerState.benchmarkSlug}
+        benchmarkName={drawerState.benchmarkName}
+        modelName={drawerState.modelName}
+      />
     </Box>
   );
 }
