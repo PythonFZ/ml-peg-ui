@@ -1,11 +1,10 @@
 'use client';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { extendTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import React from 'react';
 
-const theme = createTheme({
-  cssVariables: true,
+const theme = extendTheme({
   colorSchemes: {
     light: {},
     dark: {},

@@ -49,3 +49,17 @@ export interface BenchmarkTableResponse {
   data: MetricsRow[];
   meta: BenchmarkMeta;
 }
+
+export interface FigureItem {
+  slug: string;
+  name: string;
+}
+
+export interface FigureListResponse {
+  data: FigureItem[];
+  meta: { count: number };
+}
+
+export interface FigureResponse {
+  data: Record<string, unknown>;  // Raw Plotly JSON (has data, layout keys)
+}
