@@ -107,3 +107,64 @@ def test_figure_stub(test_client: TestClient) -> None:
     """GET /api/v1/benchmarks/{slug}/figures/{figure} returns 501 (not yet implemented)."""
     response = test_client.get("/api/v1/benchmarks/37conf8/figures/37conf8")
     assert response.status_code == 501
+
+
+def test_benchmark_table_thresholds(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/table response includes meta.thresholds with good/bad per metric."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/table")
+    assert response.status_code == 200
+    body = response.json()
+    assert "thresholds" in body["meta"], "meta missing 'thresholds'"
+    thresholds = body["meta"]["thresholds"]
+    assert isinstance(thresholds, dict), "meta.thresholds must be a dict"
+    # At least one threshold entry should exist with good/bad fields
+    assert len(thresholds) > 0, "Expected at least one threshold entry"
+    first_key = next(iter(thresholds))
+    entry = thresholds[first_key]
+    assert "good" in entry, f"Threshold entry missing 'good': {entry}"
+    assert "bad" in entry, f"Threshold entry missing 'bad': {entry}"
+
+
+def test_benchmark_table_tooltip_header(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/table response includes meta.tooltip_header dict."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/table")
+    assert response.status_code == 200
+    body = response.json()
+    assert "tooltip_header" in body["meta"], "meta missing 'tooltip_header'"
+    tooltip_header = body["meta"]["tooltip_header"]
+    assert isinstance(tooltip_header, dict), "meta.tooltip_header must be a dict"
+
+
+def test_benchmark_table_weights(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/table response includes meta.weights dict."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/table")
+    assert response.status_code == 200
+    body = response.json()
+    assert "weights" in body["meta"], "meta missing 'weights'"
+    weights = body["meta"]["weights"]
+    assert isinstance(weights, dict), "meta.weights must be a dict"
+
+
+def test_benchmark_table_columns_structured(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/table response includes meta.columns as list of {name, id} objects."""
+    response = test_client.get("/api/v1/benchmarks/37conf8/table")
+    assert response.status_code == 200
+    body = response.json()
+    columns = body["meta"]["columns"]
+    assert isinstance(columns, list), "meta.columns must be a list"
+    assert len(columns) > 0, "Expected at least one column descriptor"
+    first_col = columns[0]
+    assert "name" in first_col, f"Column descriptor missing 'name': {first_col}"
+    assert "id" in first_col, f"Column descriptor missing 'id': {first_col}"
+
+
+def test_benchmark_table_cache_headers(test_client: TestClient) -> None:
+    """GET /api/v1/benchmarks/37conf8/table includes Cache-Control header matching CACHE_HEADER."""
+    from api.index import CACHE_HEADER
+
+    response = test_client.get("/api/v1/benchmarks/37conf8/table")
+    assert response.status_code == 200
+    assert "cache-control" in response.headers, "Response missing Cache-Control header"
+    assert response.headers["cache-control"] == CACHE_HEADER, (
+        f"Expected Cache-Control: {CACHE_HEADER}, got: {response.headers.get('cache-control')}"
+    )
