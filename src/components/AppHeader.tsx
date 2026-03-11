@@ -17,8 +17,9 @@ export function AppHeader() {
     setMode(mode === 'dark' ? 'light' : 'dark');
   };
 
-  // Default to light icon on server (mode === undefined)
+  // On first render mode can be undefined — don't show toggle until hydrated
   const isDark = mode === 'dark';
+  const mounted = mode !== undefined;
 
   return (
     <AppBar position="sticky" color="default" elevation={1}>
@@ -38,14 +39,16 @@ export function AppHeader() {
           >
             <GitHubIcon />
           </IconButton>
-          <IconButton
-            onClick={handleThemeToggle}
-            aria-label="toggle dark/light mode"
-            color="inherit"
-            size="small"
-          >
-            {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
+          {mounted && (
+            <IconButton
+              onClick={handleThemeToggle}
+              aria-label="toggle dark/light mode"
+              color="inherit"
+              size="small"
+            >
+              {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

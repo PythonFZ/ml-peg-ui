@@ -21,9 +21,13 @@ export function BenchmarkSubTabs({
     router.push(`/${categorySlug}/${newValue}`);
   };
 
+  // Use false when no benchmark is active yet (e.g., during redirect)
+  const validValues = benchmarks.map((b) => b.slug);
+  const value = activeBenchmark && validValues.includes(activeBenchmark) ? activeBenchmark : false;
+
   return (
     <Tabs
-      value={activeBenchmark}
+      value={value}
       onChange={handleChange}
       variant="scrollable"
       scrollButtons="auto"

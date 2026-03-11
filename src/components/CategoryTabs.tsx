@@ -12,7 +12,10 @@ interface CategoryTabsProps {
 
 export function CategoryTabs({ categories, activeCategory }: CategoryTabsProps) {
   const router = useRouter();
-  const value = activeCategory || 'summary';
+  const validValues = ['summary', ...categories.map((c) => c.slug)];
+  const raw = activeCategory || 'summary';
+  // Use false when value isn't in the tab list (e.g., categories still loading)
+  const value = validValues.includes(raw) ? raw : false;
 
   const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     router.push(newValue === 'summary' ? '/' : `/${newValue}`);

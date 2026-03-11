@@ -10,6 +10,7 @@ const theme = createTheme({
     light: {},
     dark: {},
   },
+  colorSchemeSelector: 'data-color-scheme',
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {

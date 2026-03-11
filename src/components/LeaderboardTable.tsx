@@ -153,30 +153,6 @@ export default function LeaderboardTable({ rows, meta }: LeaderboardTableProps) 
         width: '100%',
         height: '100%',
         minHeight: 400,
-        // Sticky MLIP column
-        '& .MuiDataGrid-columnHeader[data-field="MLIP"], & .MuiDataGrid-cell[data-field="MLIP"]': {
-          position: 'sticky',
-          left: 0,
-          zIndex: (theme) => (theme.zIndex?.appBar ?? 1100) > 0 ? 4 : 4,
-          backgroundColor: 'background.paper',
-        },
-        '& .MuiDataGrid-cell[data-field="MLIP"]': {
-          zIndex: 3,
-          backgroundColor: 'background.paper',
-        },
-        // Sticky Score column
-        '& .MuiDataGrid-columnHeader[data-field="Score"]': {
-          position: 'sticky',
-          left: MLIP_WIDTH,
-          zIndex: 4,
-          backgroundColor: 'background.paper',
-        },
-        '& .MuiDataGrid-cell[data-field="Score"]': {
-          position: 'sticky',
-          left: MLIP_WIDTH,
-          zIndex: 3,
-          backgroundColor: 'background.paper',
-        },
         // Remove cell padding to allow colored cells to fill completely
         '& .MuiDataGrid-cell': {
           padding: 0,
@@ -189,6 +165,7 @@ export default function LeaderboardTable({ rows, meta }: LeaderboardTableProps) 
         getRowId={(row) => row.id}
         disableRowSelectionOnClick
         disableColumnMenu
+        disableColumnResize
         density="compact"
         sortingOrder={['asc', 'desc']}
         pageSizeOptions={[25, 50, 100]}
