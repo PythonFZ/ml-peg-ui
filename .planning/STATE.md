@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-11T07:54:03.674Z"
+stopped_at: Completed 03-01-PLAN.md — figure backend endpoints
+last_updated: "2026-03-11T08:17:11.953Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
   percent: 100
 ---
 
@@ -52,6 +52,7 @@ Progress: [██████████] 100%
 *Updated after each plan completion*
 | Phase 01.1-replace-orjsonresponse-with-pydantic-response-models P01 | 3 | 2 tasks | 7 files |
 | Phase 02-leaderboard-core P02 | 2 | 2 tasks | 8 files |
+| Phase 03-figure-drawer P01 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 02-leaderboard-core]: MUI cssVariables: true eliminates SSR flash without next-themes — built-in MUI mechanism
 - [Phase 02-leaderboard-core]: getInitColorSchemeScript() renders before providers to block hydration mismatch
 - [Phase 02-leaderboard-core]: SWR revalidateOnFocus: false prevents unnecessary refetch on tab switch
+- [Phase 03-figure-drawer]: 4 MB threshold for 307 redirect — figure files under 4 MB served inline; larger files redirect to presigned URL
+- [Phase 03-figure-drawer]: Figure slug derived from filename by stripping figure_ prefix and .json suffix — no separate metadata file needed
+- [Phase 03-figure-drawer]: figures index uses storage.list_keys() + figure_*.json filter — reuses existing storage abstraction without new methods
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T07:54:03.671Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-figure-drawer/03-CONTEXT.md
+Last session: 2026-03-11T08:17:11.950Z
+Stopped at: Completed 03-01-PLAN.md — figure backend endpoints
+Resume file: None
