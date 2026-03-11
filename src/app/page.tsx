@@ -1,12 +1,19 @@
+'use client';
+
+import { Box } from '@mui/material';
+import { CategoryTabs } from '@/components/CategoryTabs';
+import SummaryTable from '@/components/SummaryTable';
+import { useCategories } from '@/lib/api';
+
 export default function Home() {
+  const { categories, isLoading } = useCategories();
+
   return (
-    <main>
-      <h1>ML-PEG Leaderboard</h1>
-      <p>
-        A benchmarking leaderboard for Machine Learning Interatomic Potentials
-        (MLIPs) across chemical and physical benchmarks.
-      </p>
-      <p>Coming soon.</p>
-    </main>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)' }}>
+      <CategoryTabs categories={categories} activeCategory="summary" />
+      <Box sx={{ flex: 1, overflow: 'hidden', p: 0 }}>
+        {!isLoading && <SummaryTable categories={categories} />}
+      </Box>
+    </Box>
   );
 }
