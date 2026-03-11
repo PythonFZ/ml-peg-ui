@@ -81,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Used return type annotations (not response_model=) to preserve BenchmarkRow extra fields
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: Kept models_cache as list[dict] in app.state — validated on return, not on cache write
 - [Phase 01.1-replace-orjsonresponse-with-pydantic-response-models]: envelope() helper removed entirely — Meta model serves same role, type-safely
+- [Phase 02-01-leaderboard-core]: Threshold model uses ConfigDict(extra="allow") to absorb level_of_theory field present in production JSON without breaking validation
+- [Phase 02-01-leaderboard-core]: BenchmarkMeta is standalone model (not inheriting Meta) — keeps Meta clean for categories/models endpoints
+- [Phase 02-01-leaderboard-core]: tooltip_header validated as ColumnTooltip | str union type — defensive against mixed value types in production data
 - [Phase 02-leaderboard-core]: MUI cssVariables: true eliminates SSR flash without next-themes — built-in MUI mechanism
 - [Phase 02-leaderboard-core]: getInitColorSchemeScript() renders before providers to block hydration mismatch
 - [Phase 02-leaderboard-core]: SWR revalidateOnFocus: false prevents unnecessary refetch on tab switch

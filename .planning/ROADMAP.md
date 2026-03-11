@@ -61,7 +61,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Extend benchmark table API with thresholds, tooltips, weights; update TS types
+- [x] 02-01-PLAN.md — Extend benchmark table API with thresholds, tooltips, weights; update TS types (completed 2026-03-11)
 - [ ] 02-02-PLAN.md — Install MUI, wire dark/light mode, create app shell with category/benchmark tabs
 - [ ] 02-03-PLAN.md — Build LeaderboardTable with viridis_r heatmap, sticky columns, GitHub links
 - [ ] 02-04-PLAN.md — Summary table, App Router pages, deep-linkable URLs, final verification
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Infrastructure | 2/2 | Complete   | 2026-03-10 |
 | 01.1. Pydantic Response Models | 1/1 | Complete    | 2026-03-10 |
-| 2. Leaderboard Core | 0/4 | Planned | - |
+| 2. Leaderboard Core | 1/4 | In Progress | - |
 | 3. Figure Drawer | 0/? | Not started | - |
 | 4. Secondary Viewers | 0/? | Not started | - |
 | 5. UX Polish | 0/? | Not started | - |
