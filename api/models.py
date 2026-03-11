@@ -15,6 +15,40 @@ class Meta(BaseModel):
     columns: list[str] | None = None
 
 
+class Threshold(BaseModel):
+    """Good/bad bounds and optional unit for a single metric threshold."""
+
+    model_config = ConfigDict(extra="allow")
+
+    good: float
+    bad: float
+    unit: str | None = None
+
+
+class ColumnDescriptor(BaseModel):
+    """Structured column descriptor with display name and identifier."""
+
+    name: str
+    id: str
+
+
+class ColumnTooltip(BaseModel):
+    """Tooltip content for a column header."""
+
+    value: str
+    type: str = "markdown"
+
+
+class BenchmarkMeta(BaseModel):
+    """Extended metadata for the benchmark table endpoint."""
+
+    count: int
+    columns: list[ColumnDescriptor] | None = None
+    thresholds: dict[str, Threshold] = {}
+    tooltip_header: dict[str, ColumnTooltip | str] = {}
+    weights: dict[str, float] = {}
+
+
 class HealthResponse(BaseModel):
     status: str
 
@@ -44,7 +78,7 @@ class BenchmarkRow(BaseModel):
 
 class BenchmarkTableResponse(BaseModel):
     data: list[BenchmarkRow]
-    meta: Meta
+    meta: BenchmarkMeta
 
 
 class ModelEntry(BaseModel):

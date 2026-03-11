@@ -20,14 +20,18 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
 
 from api.models import (
+    BenchmarkMeta,
     BenchmarkRow,
     BenchmarkTableResponse,
     CategoriesResponse,
     CategoryItem,
+    ColumnDescriptor,
+    ColumnTooltip,
     HealthResponse,
     Meta,
     ModelEntry,
     ModelsResponse,
+    Threshold,
 )
 from api.storage import StorageBackend, create_storage
 
@@ -156,13 +160,33 @@ async def benchmark_table(slug: str, request: Request, response: Response) -> Be
         raise HTTPException(status_code=404, detail=f"Metrics table not found for '{slug}'")
 
     rows: list[dict] = payload.get("data", payload) if isinstance(payload, dict) else payload
-    columns = list(rows[0].keys()) if rows else []
+
+    # Extract rich metadata from the raw JSON (default to empty if missing)
+    raw_columns: list[dict] = payload.get("columns", []) if isinstance(payload, dict) else []
+    raw_thresholds: dict = payload.get("thresholds", {}) if isinstance(payload, dict) else {}
+    raw_tooltip_header: dict = payload.get("tooltip_header", {}) if isinstance(payload, dict) else {}
+    raw_weights: dict = payload.get("weights", {}) if isinstance(payload, dict) else {}
+
+    # Validate structured fields
+    columns_validated = [ColumnDescriptor.model_validate(c) for c in raw_columns if isinstance(c, dict)]
+    thresholds_validated = {k: Threshold.model_validate(v) for k, v in raw_thresholds.items() if isinstance(v, dict)}
+    tooltip_header_validated: dict[str, ColumnTooltip | str] = {
+        k: ColumnTooltip.model_validate(v) if isinstance(v, dict) else v
+        for k, v in raw_tooltip_header.items()
+    }
+    weights_validated = {k: float(v) for k, v in raw_weights.items() if isinstance(v, (int, float))}
 
     rows_validated = [BenchmarkRow.model_validate(r) for r in rows]
     response.headers["Cache-Control"] = CACHE_HEADER
     return BenchmarkTableResponse(
         data=rows_validated,
-        meta=Meta(count=len(rows_validated), columns=columns),
+        meta=BenchmarkMeta(
+            count=len(rows_validated),
+            columns=columns_validated if columns_validated else None,
+            thresholds=thresholds_validated,
+            tooltip_header=tooltip_header_validated,
+            weights=weights_validated,
+        ),
     )
 
 
