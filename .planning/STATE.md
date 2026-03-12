@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-secondary-viewers-02-PLAN.md
-last_updated: "2026-03-12T07:48:23.829Z"
+stopped_at: Completed 04-secondary-viewers-04-PLAN.md
+last_updated: "2026-03-12T07:48:39.722Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
@@ -111,6 +111,9 @@ Recent decisions affecting current work:
 - [Phase 04-secondary-viewers]: StructureModal rendered outside Drawer to avoid z-index stacking issues
 - [Phase 04-secondary-viewers]: getPlotlyThemeOverrides inlined in DiatomicChart — two consumers don't justify shared util
 - [Phase 04-secondary-viewers]: Pair alphabetical sort in frontend matches backend key format (Ac-H not H-Ac)
+- [Phase 04-secondary-viewers]: NEB model list hardcoded in neb-constants.ts (13 models from data/nebs/li_diffusion/) — no model-listing endpoint; add dynamic endpoint in future
+- [Phase 04-secondary-viewers]: framesToXyz converts NebFrame JSON to multi-frame XYZ for 3Dmol.js addModelsAsFrames
+- [Phase 04-secondary-viewers]: Two separate useEffect hooks in NebStructurePlayer: frames dep for viewer reinit, currentFrame dep for setFrame only
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T07:48:11.554Z
-Stopped at: Completed 04-secondary-viewers-02-PLAN.md
+Last session: 2026-03-12T07:48:39.719Z
+Stopped at: Completed 04-secondary-viewers-04-PLAN.md
 Resume file: None
