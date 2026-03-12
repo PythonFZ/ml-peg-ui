@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef, type GridRenderCellParams, type GridSortModel } from '@mui/x-data-grid';
 import { Box, Link, Tooltip } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import type { MetricsRow, BenchmarkMeta } from '@/lib/types';
+import type { ThresholdOverrides } from '@/lib/score-calc';
 import { normalizeScore, viridisR, textColorForViridis } from '@/lib/color';
 import { formatSigFigs } from '@/lib/format';
 import { MODEL_LINKS } from '@/lib/model-links';
@@ -17,6 +18,9 @@ interface LeaderboardTableProps {
   activeBenchmarkSlug?: string;
   slugsWithFigures?: Set<string> | null;
   columnVisibilityModel?: Record<string, boolean>;
+  thresholdOverrides?: ThresholdOverrides;
+  sortModel?: GridSortModel;
+  onSortModelChange?: (model: GridSortModel) => void;
 }
 
 const MLIP_WIDTH = 180;
@@ -48,6 +52,9 @@ export default function LeaderboardTable({
   activeBenchmarkSlug,
   slugsWithFigures,
   columnVisibilityModel,
+  thresholdOverrides,
+  sortModel,
+  onSortModelChange,
 }: LeaderboardTableProps) {
   const isClickable = Boolean(
     slugsWithFigures?.has(activeBenchmarkSlug ?? '')
@@ -84,7 +91,7 @@ export default function LeaderboardTable({
         const value = params.value as number | null;
         if (value == null) return <HatchedCell />;
 
-        const threshold = meta.thresholds['Score'];
+        const threshold = thresholdOverrides?.['Score'] ?? meta.thresholds['Score'];
         if (threshold) {
           const norm = normalizeScore(value, threshold.good, threshold.bad);
           const bg = viridisR(norm);
@@ -136,7 +143,7 @@ export default function LeaderboardTable({
           const value = params.value as number | null;
           if (value == null) return <HatchedCell />;
 
-          const threshold = meta.thresholds[col.id];
+          const threshold = thresholdOverrides?.[col.id] ?? meta.thresholds[col.id];
           if (threshold) {
             const norm = normalizeScore(value, threshold.good, threshold.bad);
             const bg = viridisR(norm);
@@ -162,7 +169,7 @@ export default function LeaderboardTable({
       }));
 
     return [mlipCol, scoreCol, ...metricCols];
-  }, [meta]);
+  }, [meta, thresholdOverrides]);
 
   return (
     <Box
@@ -195,6 +202,8 @@ export default function LeaderboardTable({
         }}
         columnVisibilityModel={columnVisibilityModel}
         onColumnVisibilityModelChange={() => {}}
+        sortModel={sortModel}
+        onSortModelChange={onSortModelChange}
         onCellClick={(params, event) => {
           if (!isClickable) return;
           if (

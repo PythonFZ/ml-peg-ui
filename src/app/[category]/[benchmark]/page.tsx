@@ -3,11 +3,14 @@
 import { use, useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Box, Tab, Tabs, TextField, Typography } from '@mui/material';
+import type { GridSortModel } from '@mui/x-data-grid';
 import LeaderboardTable from '@/components/LeaderboardTable';
 import TableSkeleton from '@/components/TableSkeleton';
 import FigureDrawer from '@/components/FigureDrawer';
 import { useBenchmarkTable, useBenchmarkFigures } from '@/lib/api';
 import { useFilterContext } from '@/lib/filter-context';
+import { computeScore, type WeightOverrides, type ThresholdOverrides } from '@/lib/score-calc';
+import WeightControls from '@/components/WeightControls';
 
 // Custom viewer components — lazy loaded since most benchmarks don't need them
 const DiatomicViewer = dynamic(() => import('@/components/DiatomicViewer'), { ssr: false });
@@ -28,6 +31,10 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
   const { benchmark } = use(params);
   const [activeTab, setActiveTab] = useState<'leaderboard' | 'explorer'>('leaderboard');
   const [colFilter, setColFilter] = useState('');
+  const [weightOverrides, setWeightOverrides] = useState<WeightOverrides>({});
+  const [thresholdOverrides, setThresholdOverrides] = useState<ThresholdOverrides>({});
+  // Controlled sort state to enable auto-re-sort when Score is the active sort column
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
 
   const { tableData, meta, isLoading, error } = useBenchmarkTable(benchmark);
   const { figures: figureList } = useBenchmarkFigures(benchmark);
@@ -39,9 +46,12 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
     [benchmark, hasFigures]
   );
 
-  // Reset column filter when benchmark changes
+  // Reset column filter and weight/threshold overrides when benchmark changes
   useEffect(() => {
     setColFilter('');
+    setWeightOverrides({});
+    setThresholdOverrides({});
+    setSortModel([]);
   }, [benchmark]);
 
   // Row filtering: hide non-matching models when model filter is active
@@ -52,6 +62,75 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
         : tableData,
     [tableData, selectedModels]
   );
+
+  // Enriched rows: recompute Score client-side with current weight/threshold overrides
+  const enrichedRows = useMemo(() => {
+    if (!meta) return filteredRows;
+    return filteredRows.map((row) => ({
+      ...row,
+      Score: computeScore(row, meta, weightOverrides, thresholdOverrides) ?? row.Score,
+    }));
+  }, [filteredRows, meta, weightOverrides, thresholdOverrides]);
+
+  // Merged weights for WeightControls display
+  const currentWeights = useMemo(() => {
+    if (!meta) return {};
+    return Object.fromEntries(
+      meta.columns
+        .filter((c) => c.id !== 'MLIP' && c.id !== 'Score' && c.id !== 'id')
+        .map((c) => [c.id, weightOverrides[c.id] ?? meta.weights[c.id] ?? 1])
+    );
+  }, [meta, weightOverrides]);
+
+  // Merged thresholds for WeightControls display
+  const currentThresholds = useMemo(() => {
+    if (!meta) return {};
+    return Object.fromEntries(
+      meta.columns
+        .filter((c) => c.id !== 'MLIP' && c.id !== 'Score' && c.id !== 'id')
+        .map((c) => [c.id, thresholdOverrides[c.id] ?? meta.thresholds[c.id]])
+        .filter(([, t]) => t != null)
+    );
+  }, [meta, thresholdOverrides]);
+
+  // Metric columns for WeightControls (no MLIP/Score/id)
+  const metricColumns = useMemo(
+    () =>
+      meta?.columns.filter((c) => c.id !== 'MLIP' && c.id !== 'Score' && c.id !== 'id') ?? [],
+    [meta]
+  );
+
+  const handleWeightChange = useCallback(
+    (colId: string, value: number) => {
+      setWeightOverrides((prev) => ({ ...prev, [colId]: value }));
+      // Force sort re-evaluation if Score is active sort column by replacing array identity
+      setSortModel((prev) => {
+        if (prev.length > 0 && prev[0].field === 'Score') {
+          return prev.map((s) => ({ ...s })) as GridSortModel;
+        }
+        return prev;
+      });
+    },
+    []
+  );
+
+  const handleThresholdChange = useCallback(
+    (colId: string, threshold: import('@/lib/types').Threshold) => {
+      setThresholdOverrides((prev) => ({ ...prev, [colId]: threshold }));
+      setSortModel((prev) => {
+        if (prev.length > 0 && prev[0].field === 'Score') {
+          return prev.map((s) => ({ ...s })) as GridSortModel;
+        }
+        return prev;
+      });
+    },
+    []
+  );
+
+  const handleReset = useCallback(() => {
+    setWeightOverrides({});
+    setThresholdOverrides({});
+  }, []);
 
   // Column visibility: hide columns not matching colFilter; MLIP and Score always visible
   const columnVisibilityModel = useMemo(() => {
@@ -119,6 +198,9 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
       );
     }
 
+    const totalColumnsWidth =
+      180 + 100 + (metricColumns.length * 110);
+
     return (
       <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onClick={handlePageClick}>
         <Box sx={{ px: 2, pt: 1, pb: 0.5, flexShrink: 0 }}>
@@ -131,16 +213,30 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
             inputProps={{ 'aria-label': 'Filter columns' }}
           />
         </Box>
-        <Box sx={{ flex: 1, overflow: 'hidden' }}>
-          <LeaderboardTable
-            rows={filteredRows}
-            meta={meta}
-            onCellClick={handleCellClick}
-            onColumnHeaderClick={handleColumnHeaderClick}
-            activeBenchmarkSlug={benchmark}
-            slugsWithFigures={slugsWithFigures}
-            columnVisibilityModel={columnVisibilityModel}
-          />
+        {/* Shared horizontal scroll container for DataGrid + WeightControls */}
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
+          <Box sx={{ minWidth: totalColumnsWidth }}>
+            <LeaderboardTable
+              rows={enrichedRows}
+              meta={meta}
+              onCellClick={handleCellClick}
+              onColumnHeaderClick={handleColumnHeaderClick}
+              activeBenchmarkSlug={benchmark}
+              slugsWithFigures={slugsWithFigures}
+              columnVisibilityModel={columnVisibilityModel}
+              thresholdOverrides={thresholdOverrides}
+              sortModel={sortModel}
+              onSortModelChange={setSortModel}
+            />
+            <WeightControls
+              columns={metricColumns}
+              weights={currentWeights}
+              thresholds={currentThresholds}
+              onWeightChange={handleWeightChange}
+              onThresholdChange={handleThresholdChange}
+              onReset={handleReset}
+            />
+          </Box>
         </Box>
         <FigureDrawer
           open={drawerState.open}

@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, Link } from '@mui/material';
+import { Box, Button, Link, Slider, Typography } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import type { ApiEnvelope, Category, MetricsRow } from '@/lib/types';
 import { normalizeScore, viridisR, textColorForViridis } from '@/lib/color';
@@ -54,6 +54,7 @@ interface SummaryTableProps {
 
 export default function SummaryTable({ categories, selectedModels = [] }: SummaryTableProps) {
   const { allSlugs, benchmarkData, isLoading } = useSummaryData(categories);
+  const [categoryWeights, setCategoryWeights] = useState<Record<string, number>>({});
 
   // Build a map: categorySlug -> list of benchmark slugs
   const categoryBenchmarks = useMemo(() => {
@@ -87,7 +88,7 @@ export default function SummaryTable({ categories, selectedModels = [] }: Summar
     return Array.from(ids).sort();
   }, [benchmarkData]);
 
-  // Build summary rows: one row per model with avg Score per category + overall
+  // Build summary rows: one row per model with avg Score per category + weighted overall
   const summaryRows = useMemo(() => {
     return allModelIds.map((modelId) => {
       const row: Record<string, string | number | null> = {
@@ -95,8 +96,8 @@ export default function SummaryTable({ categories, selectedModels = [] }: Summar
         MLIP: modelId,
       };
 
-      let overallSum = 0;
-      let overallCount = 0;
+      let weightedOverallSum = 0;
+      let totalOverallWeight = 0;
 
       for (const [catSlug, benchSlugs] of categoryBenchmarks) {
         let catSum = 0;
@@ -112,12 +113,13 @@ export default function SummaryTable({ categories, selectedModels = [] }: Summar
         const catAvg = catCount > 0 ? catSum / catCount : null;
         row[catSlug] = catAvg;
         if (catAvg != null) {
-          overallSum += catAvg;
-          overallCount++;
+          const catWeight = categoryWeights[catSlug] ?? 1;
+          weightedOverallSum += catWeight * catAvg;
+          totalOverallWeight += catWeight;
         }
       }
 
-      row['overall'] = overallCount > 0 ? overallSum / overallCount : null;
+      row['overall'] = totalOverallWeight > 0 ? weightedOverallSum / totalOverallWeight : null;
 
       // Set MLIP display name from any benchmark row
       for (const { rows } of benchmarkData) {
@@ -130,7 +132,7 @@ export default function SummaryTable({ categories, selectedModels = [] }: Summar
 
       return row as MetricsRow & Record<string, number | string | null>;
     });
-  }, [allModelIds, categoryBenchmarks, benchmarkRowMap, benchmarkData]);
+  }, [allModelIds, categoryBenchmarks, benchmarkRowMap, benchmarkData, categoryWeights]);
 
   // Apply model filter when active
   const filteredSummaryRows = useMemo(
@@ -282,43 +284,115 @@ export default function SummaryTable({ categories, selectedModels = [] }: Summar
     );
   }
 
+  const totalSummaryWidth = 180 + 120 + categories.length * 130;
+
   return (
     <Box
       sx={{
         width: '100%',
         height: '100%',
-        minHeight: 400,
-        '& .MuiDataGrid-columnHeader[data-field="MLIP"], & .MuiDataGrid-cell[data-field="MLIP"]': {
-          position: 'sticky',
-          left: 0,
-          zIndex: 4,
-          backgroundColor: 'background.paper',
-        },
-        '& .MuiDataGrid-cell[data-field="MLIP"]': {
-          zIndex: 3,
-          backgroundColor: 'background.paper',
-        },
-        '& .MuiDataGrid-cell': {
-          padding: 0,
-        },
+        overflow: 'auto',
       }}
     >
-      <DataGrid
-        rows={filteredSummaryRows}
-        columns={columns}
-        getRowId={(row) => row.id}
-        disableRowSelectionOnClick
-        disableColumnMenu
-        density="compact"
-        sortingOrder={['asc', 'desc']}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: 'overall', sort: 'desc' }],
+      <Box
+        sx={{
+          minWidth: totalSummaryWidth,
+          minHeight: 400,
+          '& .MuiDataGrid-columnHeader[data-field="MLIP"], & .MuiDataGrid-cell[data-field="MLIP"]': {
+            position: 'sticky',
+            left: 0,
+            zIndex: 4,
+            backgroundColor: 'background.paper',
           },
-          pagination: { paginationModel: { pageSize: 100 } },
+          '& .MuiDataGrid-cell[data-field="MLIP"]': {
+            zIndex: 3,
+            backgroundColor: 'background.paper',
+          },
+          '& .MuiDataGrid-cell': {
+            padding: 0,
+          },
         }}
-        pageSizeOptions={[25, 50, 100]}
-      />
+      >
+        <DataGrid
+          rows={filteredSummaryRows}
+          columns={columns}
+          getRowId={(row) => row.id}
+          disableRowSelectionOnClick
+          disableColumnMenu
+          density="compact"
+          sortingOrder={['asc', 'desc']}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'overall', sort: 'desc' }],
+            },
+            pagination: { paginationModel: { pageSize: 100 } },
+          }}
+          pageSizeOptions={[25, 50, 100]}
+        />
+        {/* Category weight sliders row */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            pt: 1,
+            pb: 0.5,
+            borderTop: 1,
+            borderColor: 'divider',
+          }}
+        >
+          {/* Spacer for MLIP column */}
+          <Box sx={{ minWidth: 180, width: 180, flexShrink: 0 }} />
+          {/* Spacer for Overall Score column */}
+          <Box sx={{ minWidth: 120, width: 120, flexShrink: 0 }} />
+          {/* Per-category weight slider */}
+          {categories.map((cat) => {
+            const weight = categoryWeights[cat.slug] ?? 1;
+            return (
+              <Box
+                key={cat.slug}
+                sx={{
+                  minWidth: 130,
+                  width: 130,
+                  flexShrink: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  px: 0.5,
+                  gap: 0.25,
+                }}
+              >
+                <Slider
+                  orientation="vertical"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  size="small"
+                  value={weight}
+                  sx={{ height: 56 }}
+                  aria-label={`${cat.name} category weight`}
+                  onChange={(_e, val) =>
+                    setCategoryWeights((prev) => ({ ...prev, [cat.slug]: val as number }))
+                  }
+                />
+                <Typography variant="caption" sx={{ lineHeight: 1.2 }}>
+                  {weight.toFixed(2)}
+                </Typography>
+              </Box>
+            );
+          })}
+          {/* Reset button */}
+          <Box sx={{ minWidth: 80, display: 'flex', alignItems: 'flex-start', pt: 1, pl: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setCategoryWeights({})}
+            >
+              Reset
+            </Button>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 }
