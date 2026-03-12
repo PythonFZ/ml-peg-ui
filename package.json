@@ -30,6 +30,7 @@
     "@types/react-dom": "^19.0.0",
     "@types/react-plotly.js": "^2.6.4",
     "concurrently": "^9.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18"
   }
 }
