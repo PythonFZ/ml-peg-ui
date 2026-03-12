@@ -1,11 +1,15 @@
 """FastAPI application for ml-peg benchmark leaderboard API.
 
-Serves benchmark data with 5 endpoints:
+Serves benchmark data with 9 endpoints:
 - GET /api/v1/health      — liveness check
 - GET /api/v1/categories  — all categories with embedded benchmark lists
 - GET /api/v1/benchmarks/{slug}/table — metrics table for a benchmark
-- GET /api/v1/benchmarks/{slug}/figures/{figure_slug} — figure data (stubbed)
+- GET /api/v1/benchmarks/{slug}/figures/{figure_slug} — figure data
 - GET /api/v1/models      — unique models across all benchmarks
+- GET /api/v1/diatomics/index — diatomic element pair index
+- GET /api/v1/diatomics/curves/{pair} — potential energy curves for an element pair
+- GET /api/v1/structures/{benchmark_slug}/{model}/{filename} — raw xyz structure
+- GET /api/v1/nebs/{benchmark}/{model}/{band}/frames — NEB trajectory frames
 
 Storage is abstracted via api.storage: FilesystemBackend in local dev,
 MinioBackend in production (when MINIO_ENDPOINT is set).
@@ -13,6 +17,7 @@ MinioBackend in production (when MINIO_ENDPOINT is set).
 
 from __future__ import annotations
 
+import io
 import logging
 from contextlib import asynccontextmanager
 
@@ -28,6 +33,9 @@ from api.models import (
     CategoryItem,
     ColumnDescriptor,
     ColumnTooltip,
+    DiatomicCurve,
+    DiatomicCurvesResponse,
+    DiatomicIndexResponse,
     FigureItem,
     FigureListResponse,
     FigureResponse,
@@ -35,6 +43,10 @@ from api.models import (
     Meta,
     ModelEntry,
     ModelsResponse,
+    NebFrame,
+    NebFramesResponse,
+    StructureData,
+    StructureResponse,
     Threshold,
 )
 from api.storage import StorageBackend, create_storage
@@ -110,6 +122,7 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     app.state.categories = categories
     app.state.slug_map = slug_map
     app.state.models_cache = None  # lazily computed on first /models request
+    app.state.diatomic_index = None  # lazily computed on first /diatomics/index request
 
     logger.info(
         "API ready: %d categories, %d benchmarks indexed",
@@ -296,6 +309,180 @@ async def models(request: Request, response: Response) -> ModelsResponse:
     response.headers["Cache-Control"] = CACHE_HEADER
     model_entries = [ModelEntry.model_validate(m) for m in model_list]
     return ModelsResponse(data=model_entries, meta=Meta(count=len(model_entries)))
+
+
+def _get_diatomic_index(request: Request) -> dict[str, list[str]]:
+    """Load the diatomic index from storage, caching in app.state after first load."""
+    if request.app.state.diatomic_index is not None:
+        return request.app.state.diatomic_index
+
+    storage: StorageBackend = request.app.state.storage
+    try:
+        index = storage.get_json("physicality/diatomics/diatomic_index.json")
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=503,
+            detail="Diatomic index not found — run scripts/build_diatomic_index.py",
+        )
+    request.app.state.diatomic_index = index
+    return index
+
+
+@router.get("/diatomics/index")
+async def diatomic_index(request: Request, response: Response) -> DiatomicIndexResponse:
+    """Return the diatomic element pair index.
+
+    Maps each element pair (e.g. 'H-H') to the list of models with data for that pair.
+    """
+    index = _get_diatomic_index(request)
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return DiatomicIndexResponse(data=index, meta=Meta(count=len(index)))
+
+
+@router.get("/diatomics/curves/{pair}")
+async def diatomic_curves(pair: str, request: Request, response: Response) -> DiatomicCurvesResponse:
+    """Return all diatomic potential energy curves for a given element pair.
+
+    Returns 404 if the pair is not in the index.
+    """
+    storage: StorageBackend = request.app.state.storage
+    index = _get_diatomic_index(request)
+
+    if pair not in index:
+        raise HTTPException(status_code=404, detail=f"Diatomic pair '{pair}' not found")
+
+    curves: list[DiatomicCurve] = []
+    for model_id in index[pair]:
+        try:
+            data = storage.get_json(f"physicality/diatomics/curves/{model_id}/{pair}.json")
+            curves.append(
+                DiatomicCurve(
+                    model=model_id,
+                    pair=data.get("pair", pair),
+                    distance=data.get("distance", []),
+                    energy=data.get("energy", []),
+                )
+            )
+        except FileNotFoundError:
+            # Index may be stale; skip missing files gracefully
+            logger.warning("Diatomic curve file missing for %s/%s", model_id, pair)
+
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return DiatomicCurvesResponse(data=curves, meta=Meta(count=len(curves)))
+
+
+@router.get("/structures/{benchmark_slug}/{model}/{filename}")
+async def structure(
+    benchmark_slug: str,
+    model: str,
+    filename: str,
+    request: Request,
+    response: Response,
+) -> StructureResponse:
+    """Return the raw xyz string and has_pbc flag for a structure file.
+
+    Returns 404 if benchmark slug or file is not found.
+    """
+    slug_map: dict[str, str] = request.app.state.slug_map
+    storage: StorageBackend = request.app.state.storage
+
+    bench_path = slug_map.get(benchmark_slug.lower())
+    if bench_path is None:
+        raise HTTPException(status_code=404, detail=f"Benchmark '{benchmark_slug}' not found")
+
+    file_path = f"{bench_path}/{model}/{filename}"
+    try:
+        raw = storage.get_bytes(file_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Structure file '{filename}' not found")
+
+    xyz_string = raw.decode("utf-8", errors="replace")
+
+    # Detect PBC from the second line of the xyz file: pbc="T T T"
+    lines = xyz_string.splitlines()
+    has_pbc = False
+    if len(lines) >= 2:
+        second_line = lines[1]
+        has_pbc = 'pbc="T T T"' in second_line or "pbc='T T T'" in second_line
+
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return StructureResponse(data=StructureData(xyz_string=xyz_string, has_pbc=has_pbc))
+
+
+@router.get("/nebs/{benchmark}/{model}/{band}/frames")
+async def neb_frames(
+    benchmark: str,
+    model: str,
+    band: str,
+    request: Request,
+    response: Response,
+) -> NebFramesResponse:
+    """Return parsed NEB trajectory frames for the given benchmark/model/band.
+
+    Returns 404 if the benchmark, model, or band combination has no data.
+    """
+    import ase.io  # type: ignore[import-untyped]
+
+    storage: StorageBackend = request.app.state.storage
+
+    # List files in the model directory to find the matching band file
+    model_prefix = f"nebs/{benchmark}/{model}"
+    try:
+        keys = storage.list_keys(model_prefix)
+    except Exception:
+        keys = []
+
+    if not keys:
+        raise HTTPException(status_code=404, detail=f"No NEB data found for '{benchmark}/{model}'")
+
+    # Find the file matching pattern *-{band}-neb-band.extxyz
+    # Handles both hyphen and underscore variants (e.g. mattersim-5M vs mattersim_5M)
+    band_suffix = f"-{band}-neb-band.extxyz"
+    matching_key = None
+    for key in keys:
+        if key.endswith(band_suffix):
+            matching_key = key
+            break
+
+    if matching_key is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No NEB band '{band}' found for '{benchmark}/{model}'",
+        )
+
+    file_path = f"{model_prefix}/{matching_key}"
+    try:
+        raw = storage.get_bytes(file_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"NEB file not found: {file_path}")
+
+    # Parse extxyz with ASE
+    atoms_list = ase.io.read(io.StringIO(raw.decode("utf-8")), index=":", format="extxyz")
+
+    frames: list[NebFrame] = []
+    for atoms in atoms_list:
+        # Energy from calculator results (ASE stores energy/free_energy in calc)
+        energy = 0.0
+        if atoms.calc is not None:
+            results = atoms.calc.results
+            energy = float(results.get("energy", results.get("free_energy", 0.0)))
+
+        # Lattice: 3x3 matrix if periodic, None if non-periodic
+        lattice = None
+        if any(atoms.pbc):
+            lattice = atoms.cell.tolist()
+
+        frames.append(
+            NebFrame(
+                energy=energy,
+                species=atoms.get_chemical_symbols(),
+                positions=atoms.positions.tolist(),
+                lattice=lattice,
+            )
+        )
+
+    response.headers["Cache-Control"] = CACHE_HEADER
+    return NebFramesResponse(data=frames, meta=Meta(count=len(frames)))
 
 
 # Build the FastAPI application
