@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Box, Drawer, Typography, IconButton } from '@mui/material';
+import { Box, Button, Drawer, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import { useColorScheme } from '@mui/material/styles';
 import { useBenchmarkFigures, useFigureData } from '@/lib/api';
 import FigureSkeleton from './FigureSkeleton';
+import StructureModal from './StructureModal';
 import type { FigureItem } from '@/lib/types';
 
 // PlotlyChart is ONLY imported here via dynamic — never directly.
@@ -124,6 +126,7 @@ export default function FigureDrawer({
   filterModel,
 }: FigureDrawerProps) {
   const { figures, isLoading, error } = useBenchmarkFigures(open ? benchmarkSlug : null);
+  const [structureOpen, setStructureOpen] = useState(false);
 
   // Close on Escape key (persistent drawers don't handle this automatically)
   useEffect(() => {
@@ -135,81 +138,113 @@ export default function FigureDrawer({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose]);
 
+  // Reset structure modal when drawer closes or context changes
+  useEffect(() => {
+    if (!open || !benchmarkSlug || !filterModel) {
+      setStructureOpen(false);
+    }
+  }, [open, benchmarkSlug, filterModel]);
+
   return (
-    <Drawer
-      anchor="right"
-      variant="persistent"
-      open={open}
-      PaperProps={{
-        onClick: (e: React.MouseEvent) => e.stopPropagation(),
-        sx: {
-          width: { xs: '100%', md: '50vw' },
-          boxShadow: open ? '-4px 0 24px rgba(0,0,0,0.15)' : 'none',
-        },
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 2,
-          py: 1.5,
-          borderBottom: 1,
-          borderColor: 'divider',
-          flexShrink: 0,
+    <>
+      <Drawer
+        anchor="right"
+        variant="persistent"
+        open={open}
+        PaperProps={{
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+          sx: {
+            width: { xs: '100%', md: '50vw' },
+            boxShadow: open ? '-4px 0 24px rgba(0,0,0,0.15)' : 'none',
+          },
         }}
       >
-        <Box>
-          <Typography variant="subtitle1" fontWeight={700} component="div">
-            {benchmarkName}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" component="div">
-            {filterModel ?? 'All models'}
-          </Typography>
+        {/* Header */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 2,
+            py: 1.5,
+            borderBottom: 1,
+            borderColor: 'divider',
+            flexShrink: 0,
+          }}
+        >
+          <Box>
+            <Typography variant="subtitle1" fontWeight={700} component="div">
+              {benchmarkName}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" component="div">
+              {filterModel ?? 'All models'}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {filterModel && benchmarkSlug && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<ViewInArIcon />}
+                onClick={() => setStructureOpen(true)}
+              >
+                View Structure
+              </Button>
+            )}
+            <IconButton onClick={onClose} aria-label="close drawer" size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
-        <IconButton onClick={onClose} aria-label="close drawer" size="small">
-          <CloseIcon />
-        </IconButton>
-      </Box>
 
-      {/* Body */}
-      <Box sx={{ overflowY: 'auto', flex: 1, px: 2, py: 2 }}>
-        {isLoading && (
-          <>
-            <FigureSkeleton />
-            <Box sx={{ mt: 3 }}>
+        {/* Body */}
+        <Box sx={{ overflowY: 'auto', flex: 1, px: 2, py: 2 }}>
+          {isLoading && (
+            <>
               <FigureSkeleton />
-            </Box>
-          </>
-        )}
+              <Box sx={{ mt: 3 }}>
+                <FigureSkeleton />
+              </Box>
+            </>
+          )}
 
-        {error && (
-          <Typography color="error" variant="body2">
-            Failed to load figures. Please check your connection and try again.
-          </Typography>
-        )}
+          {error && (
+            <Typography color="error" variant="body2">
+              Failed to load figures. Please check your connection and try again.
+            </Typography>
+          )}
 
-        {!isLoading && !error && figures.length === 0 && (
-          <Typography color="text.secondary" variant="body2">
-            No figures available for this benchmark.
-          </Typography>
-        )}
+          {!isLoading && !error && figures.length === 0 && (
+            <Typography color="text.secondary" variant="body2">
+              No figures available for this benchmark.
+            </Typography>
+          )}
 
-        {!isLoading && !error && figures.length > 0 && benchmarkSlug && (
-          <>
-            {figures.map((figure) => (
-              <FigurePanel
-                key={`${figure.slug}::${filterModel ?? 'all'}`}
-                benchmarkSlug={benchmarkSlug}
-                figure={figure}
-                filterModel={filterModel}
-              />
-            ))}
-          </>
-        )}
-      </Box>
-    </Drawer>
+          {!isLoading && !error && figures.length > 0 && benchmarkSlug && (
+            <>
+              {figures.map((figure) => (
+                <FigurePanel
+                  key={`${figure.slug}::${filterModel ?? 'all'}`}
+                  benchmarkSlug={benchmarkSlug}
+                  figure={figure}
+                  filterModel={filterModel}
+                />
+              ))}
+            </>
+          )}
+        </Box>
+      </Drawer>
+
+      {/* Structure modal — rendered outside Drawer to avoid z-index issues */}
+      {structureOpen && benchmarkSlug && filterModel && (
+        <StructureModal
+          open={structureOpen}
+          onClose={() => setStructureOpen(false)}
+          benchmarkSlug={benchmarkSlug}
+          model={filterModel}
+          filename={`${filterModel}.xyz`}
+        />
+      )}
+    </>
   );
 }
