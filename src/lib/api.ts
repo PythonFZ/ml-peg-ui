@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import type { ApiEnvelope, BenchmarkTableResponse, Category, DiatomicCurvesResponse, DiatomicIndexResponse, FigureListResponse, FigureResponse, NebFramesResponse } from './types';
+import type { ApiEnvelope, BenchmarkTableResponse, Category, DiatomicCurvesResponse, DiatomicIndexResponse, FigureListResponse, FigureResponse, Model, NebFramesResponse } from './types';
 
 export const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -14,6 +14,15 @@ export function useCategories() {
     isLoading,
     error,
   };
+}
+
+export function useModels() {
+  const { data, isLoading, error } = useSWR<ApiEnvelope<Model[]>>(
+    '/api/v1/models',
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  return { models: data?.data ?? [], isLoading, error };
 }
 
 export function useBenchmarkTable(slug: string | null) {

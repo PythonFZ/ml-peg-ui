@@ -1,12 +1,13 @@
 'use client';
 
-import { use, useState, useCallback, useMemo } from 'react';
+import { use, useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Tab, Tabs, TextField, Typography } from '@mui/material';
 import LeaderboardTable from '@/components/LeaderboardTable';
 import TableSkeleton from '@/components/TableSkeleton';
 import FigureDrawer from '@/components/FigureDrawer';
 import { useBenchmarkTable, useBenchmarkFigures } from '@/lib/api';
+import { useFilterContext } from '@/lib/filter-context';
 
 // Custom viewer components — lazy loaded since most benchmarks don't need them
 const DiatomicViewer = dynamic(() => import('@/components/DiatomicViewer'), { ssr: false });
@@ -26,15 +27,41 @@ interface BenchmarkPageProps {
 export default function BenchmarkPage({ params }: BenchmarkPageProps) {
   const { benchmark } = use(params);
   const [activeTab, setActiveTab] = useState<'leaderboard' | 'explorer'>('leaderboard');
+  const [colFilter, setColFilter] = useState('');
 
   const { tableData, meta, isLoading, error } = useBenchmarkTable(benchmark);
   const { figures: figureList } = useBenchmarkFigures(benchmark);
+  const { selectedModels } = useFilterContext();
 
   const hasFigures = figureList.length > 0;
   const slugsWithFigures = useMemo(
     () => (hasFigures ? new Set([benchmark]) : new Set<string>()),
     [benchmark, hasFigures]
   );
+
+  // Reset column filter when benchmark changes
+  useEffect(() => {
+    setColFilter('');
+  }, [benchmark]);
+
+  // Row filtering: hide non-matching models when model filter is active
+  const filteredRows = useMemo(
+    () =>
+      selectedModels.length > 0
+        ? tableData.filter((row) => selectedModels.includes(row.MLIP as string))
+        : tableData,
+    [tableData, selectedModels]
+  );
+
+  // Column visibility: hide columns not matching colFilter; MLIP and Score always visible
+  const columnVisibilityModel = useMemo(() => {
+    if (!colFilter.trim() || !meta) return {};
+    return Object.fromEntries(
+      meta.columns
+        .filter((col) => col.id !== 'MLIP' && col.id !== 'Score' && col.id !== 'id')
+        .map((col) => [col.id, col.name.toLowerCase().includes(colFilter.toLowerCase())])
+    );
+  }, [colFilter, meta]);
 
   const [drawerState, setDrawerState] = useState<{
     open: boolean;
@@ -93,15 +120,28 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
     }
 
     return (
-      <Box sx={{ width: '100%', height: '100%' }} onClick={handlePageClick}>
-        <LeaderboardTable
-          rows={tableData}
-          meta={meta}
-          onCellClick={handleCellClick}
-          onColumnHeaderClick={handleColumnHeaderClick}
-          activeBenchmarkSlug={benchmark}
-          slugsWithFigures={slugsWithFigures}
-        />
+      <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onClick={handlePageClick}>
+        <Box sx={{ px: 2, pt: 1, pb: 0.5, flexShrink: 0 }}>
+          <TextField
+            size="small"
+            placeholder="Filter columns..."
+            value={colFilter}
+            onChange={(e) => setColFilter(e.target.value)}
+            sx={{ width: 220 }}
+            inputProps={{ 'aria-label': 'Filter columns' }}
+          />
+        </Box>
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <LeaderboardTable
+            rows={filteredRows}
+            meta={meta}
+            onCellClick={handleCellClick}
+            onColumnHeaderClick={handleColumnHeaderClick}
+            activeBenchmarkSlug={benchmark}
+            slugsWithFigures={slugsWithFigures}
+            columnVisibilityModel={columnVisibilityModel}
+          />
+        </Box>
         <FigureDrawer
           open={drawerState.open}
           onClose={() => setDrawerState((prev) => ({ ...prev, open: false }))}

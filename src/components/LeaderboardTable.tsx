@@ -16,6 +16,7 @@ interface LeaderboardTableProps {
   onColumnHeaderClick?: (benchmarkSlug: string) => void;
   activeBenchmarkSlug?: string;
   slugsWithFigures?: Set<string> | null;
+  columnVisibilityModel?: Record<string, boolean>;
 }
 
 const MLIP_WIDTH = 180;
@@ -46,6 +47,7 @@ export default function LeaderboardTable({
   onColumnHeaderClick,
   activeBenchmarkSlug,
   slugsWithFigures,
+  columnVisibilityModel,
 }: LeaderboardTableProps) {
   const isClickable = Boolean(
     slugsWithFigures?.has(activeBenchmarkSlug ?? '')
@@ -191,6 +193,8 @@ export default function LeaderboardTable({
         initialState={{
           pagination: { paginationModel: { pageSize: 100 } },
         }}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={() => {}}
         onCellClick={(params, event) => {
           if (!isClickable) return;
           if (

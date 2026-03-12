@@ -49,9 +49,10 @@ function useSummaryData(categories: Category[]) {
 
 interface SummaryTableProps {
   categories: Category[];
+  selectedModels?: string[];
 }
 
-export default function SummaryTable({ categories }: SummaryTableProps) {
+export default function SummaryTable({ categories, selectedModels = [] }: SummaryTableProps) {
   const { allSlugs, benchmarkData, isLoading } = useSummaryData(categories);
 
   // Build a map: categorySlug -> list of benchmark slugs
@@ -130,6 +131,15 @@ export default function SummaryTable({ categories }: SummaryTableProps) {
       return row as MetricsRow & Record<string, number | string | null>;
     });
   }, [allModelIds, categoryBenchmarks, benchmarkRowMap, benchmarkData]);
+
+  // Apply model filter when active
+  const filteredSummaryRows = useMemo(
+    () =>
+      selectedModels.length > 0
+        ? summaryRows.filter((row) => selectedModels.includes(row.MLIP as string))
+        : summaryRows,
+    [summaryRows, selectedModels]
+  );
 
   // Compute min/max Score across all rows for normalization (use 0=bad, 1=good range)
   // Category Score columns: normalize between 0 and 1 (higher is better)
@@ -256,6 +266,14 @@ export default function SummaryTable({ categories }: SummaryTableProps) {
     return <TableSkeleton rows={12} columns={categories.length + 2 || 8} />;
   }
 
+  if (filteredSummaryRows.length === 0 && selectedModels.length > 0) {
+    return (
+      <Box sx={{ p: 2, color: 'text.secondary' }}>
+        No models match the current filter.
+      </Box>
+    );
+  }
+
   if (summaryRows.length === 0) {
     return (
       <Box sx={{ p: 2, color: 'text.secondary' }}>
@@ -286,7 +304,7 @@ export default function SummaryTable({ categories }: SummaryTableProps) {
       }}
     >
       <DataGrid
-        rows={summaryRows}
+        rows={filteredSummaryRows}
         columns={columns}
         getRowId={(row) => row.id}
         disableRowSelectionOnClick
