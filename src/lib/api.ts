@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import type { ApiEnvelope, BenchmarkTableResponse, Category, FigureListResponse, FigureResponse } from './types';
+import type { ApiEnvelope, BenchmarkTableResponse, Category, DiatomicCurvesResponse, DiatomicIndexResponse, FigureListResponse, FigureResponse, NebFramesResponse } from './types';
 
 export const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -53,6 +53,60 @@ export function useFigureData(benchmarkSlug: string | null, figureSlug: string |
   );
   return {
     figureData: data?.data ?? null,
+    isLoading,
+    error,
+  };
+}
+
+export function useDiatomicIndex() {
+  const { data, isLoading, error } = useSWR<DiatomicIndexResponse>(
+    '/api/v1/diatomics/index',
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  return {
+    index: data?.data ?? {},
+    isLoading,
+    error,
+  };
+}
+
+export function useDiatomicCurves(pair: string | null) {
+  const { data, isLoading, error } = useSWR<DiatomicCurvesResponse>(
+    pair ? `/api/v1/diatomics/curves/${pair}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  return {
+    curves: data?.data ?? [],
+    isLoading,
+    error,
+  };
+}
+
+export function useNebFrames(benchmark: string, model: string | null, band: string) {
+  const { data, isLoading, error } = useSWR<NebFramesResponse>(
+    model ? `/api/v1/nebs/${benchmark}/${model}/${band}/frames` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  return {
+    frames: data?.data ?? [],
+    isLoading,
+    error,
+  };
+}
+
+export function useStructure(benchmarkSlug: string | null, model: string | null, filename: string | null) {
+  const { data, isLoading, error } = useSWR<import('./types').StructureResponse>(
+    benchmarkSlug && model && filename
+      ? `/api/v1/structures/${benchmarkSlug}/${model}/${filename}`
+      : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  return {
+    structureData: data?.data ?? null,
     isLoading,
     error,
   };

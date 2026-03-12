@@ -63,3 +63,41 @@ export interface FigureListResponse {
 export interface FigureResponse {
   data: Record<string, unknown>;  // Raw Plotly JSON (has data, layout keys)
 }
+
+export interface DiatomicCurve {
+  model: string;
+  pair: string;
+  distance: number[];
+  energy: number[];
+}
+
+export interface DiatomicIndexResponse {
+  data: Record<string, string[]>;
+  meta: { count: number };
+}
+
+export interface DiatomicCurvesResponse {
+  data: DiatomicCurve[];
+  meta: { count: number };
+}
+
+export interface NebFrame {
+  energy: number;
+  species: string[];
+  positions: number[][];
+  lattice: number[][] | null;
+}
+
+export interface NebFramesResponse {
+  data: NebFrame[];
+  meta: { count: number };
+}
+
+export interface StructureData {
+  xyz_string: string;
+  has_pbc: boolean;
+}
+
+export interface StructureResponse {
+  data: StructureData;
+}
