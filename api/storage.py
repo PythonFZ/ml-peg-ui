@@ -23,6 +23,13 @@ class StorageBackend(Protocol):
         """Read and parse a JSON object from the given path."""
         ...
 
+    def get_bytes(self, path: str) -> bytes:
+        """Read raw bytes from the given path.
+
+        Raises FileNotFoundError if the object does not exist.
+        """
+        ...
+
     def list_keys(self, prefix: str) -> list[str]:
         """List all keys (files/dirs) under the given prefix."""
         ...
@@ -54,6 +61,16 @@ class FilesystemBackend:
         if not full_path.exists():
             raise FileNotFoundError(f"No such file: {full_path}")
         return json.loads(full_path.read_bytes())
+
+    def get_bytes(self, path: str) -> bytes:
+        """Read raw bytes from base_path/path.
+
+        Raises FileNotFoundError if the file does not exist.
+        """
+        full_path = self._base / path
+        if not full_path.exists():
+            raise FileNotFoundError(f"No such file: {full_path}")
+        return full_path.read_bytes()
 
     def list_keys(self, prefix: str) -> list[str]:
         """List all files and directories under base_path/prefix.
@@ -123,6 +140,25 @@ class MinioBackend:
         finally:
             response.close()
             response.release_conn()
+
+    def get_bytes(self, path: str) -> bytes:
+        """Fetch raw bytes for an object from MinIO.
+
+        Raises FileNotFoundError if the object does not exist.
+        """
+        from minio.error import S3Error  # type: ignore[import-untyped]
+
+        try:
+            response = self.client.get_object(self.bucket, self._key(path))
+            try:
+                return response.read()
+            finally:
+                response.close()
+                response.release_conn()
+        except S3Error as exc:
+            if exc.code == "NoSuchKey":
+                raise FileNotFoundError(f"No such key: {path}") from exc
+            raise
 
     def list_keys(self, prefix: str) -> list[str]:
         """List object keys in the bucket under the given prefix."""

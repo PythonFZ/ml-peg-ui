@@ -109,3 +109,64 @@ class FigureResponse(BaseModel):
     """Response for the figure detail endpoint (inline Plotly JSON)."""
 
     data: dict
+
+
+# --- Phase 4: Secondary Viewer Models ---
+
+
+class DiatomicCurve(BaseModel):
+    """A single diatomic potential energy curve for one model and element pair."""
+
+    model: str
+    pair: str
+    distance: list[float]
+    energy: list[float]
+
+
+class DiatomicIndexResponse(BaseModel):
+    """Response for the diatomic index endpoint.
+
+    Maps element pairs (e.g. 'H-H') to lists of models with data for that pair.
+    """
+
+    data: dict[str, list[str]]
+    meta: Meta
+
+
+class DiatomicCurvesResponse(BaseModel):
+    """Response for the diatomic curves endpoint.
+
+    Returns all available curves for a given element pair across models.
+    """
+
+    data: list[DiatomicCurve]
+    meta: Meta
+
+
+class StructureData(BaseModel):
+    """Raw structure data parsed from an XYZ file."""
+
+    xyz_string: str
+    has_pbc: bool
+
+
+class StructureResponse(BaseModel):
+    """Response for the structure endpoint."""
+
+    data: StructureData
+
+
+class NebFrame(BaseModel):
+    """A single frame in a NEB trajectory."""
+
+    energy: float
+    species: list[str]
+    positions: list[list[float]]
+    lattice: list[list[float]] | None
+
+
+class NebFramesResponse(BaseModel):
+    """Response for the NEB frames endpoint."""
+
+    data: list[NebFrame]
+    meta: Meta
