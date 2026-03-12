@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-12T09:24:10.614Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-12T09:31:46.442Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 16
-  completed_plans: 14
+  completed_plans: 15
   percent: 100
 ---
 
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 04-secondary-viewers P02 | 4 | 2 tasks | 5 files |
 | Phase 04-secondary-viewers P04 | 12 | 2 tasks | 6 files |
 | Phase 05-ux-polish P01 | 5 | 2 tasks | 7 files |
+| Phase 05-ux-polish P02 | 5 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,8 @@ Recent decisions affecting current work:
 - [Phase 05-ux-polish]: FilterProvider wraps both AppHeader and children in layout.tsx so both share the same context instance
 - [Phase 05-ux-polish]: columnVisibilityModel controlled by colFilter; onColumnVisibilityModelChange is no-op to prevent DataGrid overwriting controlled state
 - [Phase 05-ux-polish]: Column filter resets via useEffect([benchmark]) on benchmark route param change
+- [Phase 05-ux-polish]: computeScore excludes metrics with weight===0 or missing threshold; threshold inputs fire on blur only; WeightControls inside shared scroll container with DataGrid
+- [Phase 05-ux-polish]: SummaryTable manages its own categoryWeights state internally; GridSortModel uses map identity replacement to trigger re-sort
 
 ### Pending Todos
 
@@ -135,6 +138,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T09:24:10.611Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-12T09:31:46.439Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
