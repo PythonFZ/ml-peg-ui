@@ -6,7 +6,7 @@ import { Box, Button, Drawer, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import { useColorScheme } from '@mui/material/styles';
-import { useBenchmarkFigures, useFigureData } from '@/lib/api';
+import { useBenchmarkFigures, useFigureData, useStructure } from '@/lib/api';
 import FigureSkeleton from './FigureSkeleton';
 import StructureModal from './StructureModal';
 import type { FigureItem } from '@/lib/types';
@@ -128,6 +128,15 @@ export default function FigureDrawer({
   const { figures, isLoading, error } = useBenchmarkFigures(open ? benchmarkSlug : null);
   const [structureOpen, setStructureOpen] = useState(false);
 
+  // Pre-check if structure exists for this benchmark/model combo
+  const structureFilename = filterModel ? `${filterModel}.xyz` : null;
+  const { structureData: structureCheck } = useStructure(
+    open && filterModel ? benchmarkSlug : null,
+    open ? filterModel : null,
+    open ? structureFilename : null,
+  );
+  const hasStructure = structureCheck !== null;
+
   // Close on Escape key (persistent drawers don't handle this automatically)
   useEffect(() => {
     if (!open) return;
@@ -181,7 +190,7 @@ export default function FigureDrawer({
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {filterModel && benchmarkSlug && (
+            {filterModel && benchmarkSlug && hasStructure && (
               <Button
                 variant="outlined"
                 size="small"

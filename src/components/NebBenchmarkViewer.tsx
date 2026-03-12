@@ -4,7 +4,6 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Box,
-  Container,
   FormControl,
   InputLabel,
   MenuItem,
@@ -18,30 +17,31 @@ import {
 import { useNebFrames } from '@/lib/api';
 import { NEB_BANDS, NEB_LI_DIFFUSION_MODELS } from '@/lib/neb-constants';
 
-const NebViewer = dynamic(() => import('@/components/NebViewer'), { ssr: false });
+const NebViewer = dynamic(() => import('./NebViewer'), { ssr: false });
 
-export default function NebLiDiffusionPage() {
+interface NebBenchmarkViewerProps {
+  benchmarkSlug: string;
+}
+
+export default function NebBenchmarkViewer({ benchmarkSlug }: NebBenchmarkViewerProps) {
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedBand, setSelectedBand] = useState<string>('b');
 
+  // Map benchmark slug back to the API benchmark name
+  const apiBenchmark = benchmarkSlug.replace(/-/g, '_');
+
   const { frames, isLoading, error } = useNebFrames(
-    'li_diffusion',
+    apiBenchmark,
     selectedModel,
     selectedBand
   );
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" fontWeight={700}>
-          NEB Trajectory Viewer
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Li Diffusion
-        </Typography>
-      </Box>
+  // TODO: when more NEB benchmarks are added, load models dynamically from API
+  const models = NEB_LI_DIFFUSION_MODELS;
 
-      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+  return (
+    <Box sx={{ p: 2, overflow: 'auto', height: '100%' }}>
+      <Paper elevation={2} sx={{ p: 3 }}>
         <Box
           sx={{
             display: 'flex',
@@ -51,7 +51,6 @@ export default function NebLiDiffusionPage() {
             mb: selectedModel ? 3 : 0,
           }}
         >
-          {/* Model selector */}
           <FormControl sx={{ minWidth: 280 }} size="small">
             <InputLabel id="neb-model-label">Model</InputLabel>
             <Select
@@ -63,7 +62,7 @@ export default function NebLiDiffusionPage() {
               <MenuItem value="">
                 <em>Select a model</em>
               </MenuItem>
-              {NEB_LI_DIFFUSION_MODELS.map((model) => (
+              {models.map((model) => (
                 <MenuItem key={model} value={model}>
                   {model}
                 </MenuItem>
@@ -71,7 +70,6 @@ export default function NebLiDiffusionPage() {
             </Select>
           </FormControl>
 
-          {/* Band selector */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
               Band
@@ -94,7 +92,6 @@ export default function NebLiDiffusionPage() {
           </Box>
         </Box>
 
-        {/* Content area */}
         {!selectedModel && (
           <Typography color="text.secondary" variant="body2" sx={{ mt: 2 }}>
             Select a model above to view the NEB trajectory.
@@ -119,6 +116,6 @@ export default function NebLiDiffusionPage() {
           <NebViewer frames={frames} band={selectedBand} />
         )}
       </Paper>
-    </Container>
+    </Box>
   );
 }

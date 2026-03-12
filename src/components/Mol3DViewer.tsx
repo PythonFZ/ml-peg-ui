@@ -27,7 +27,8 @@ export default function Mol3DViewer({ xyzData, hasPbc }: Mol3DViewerProps) {
       }
 
       const viewer = $3Dmol.createViewer(containerRef.current, {
-        backgroundColor: 'transparent',
+        backgroundColor: 'white',
+        backgroundAlpha: 0,
       });
 
       const model = viewer.addModel(xyzData, 'xyz');

@@ -69,7 +69,8 @@ export default function NebStructurePlayer({
       }
 
       const viewer: Viewer3Dmol = $3Dmol.createViewer(containerRef.current, {
-        backgroundColor: 'transparent',
+        backgroundColor: 'white',
+        backgroundAlpha: 0,
       });
       viewerRef.current = viewer;
 
@@ -115,7 +116,7 @@ export default function NebStructurePlayer({
         position: 'relative',
         borderRadius: 1,
         overflow: 'hidden',
-        bgcolor: 'transparent',
+        zIndex: 0,
       }}
     />
   );

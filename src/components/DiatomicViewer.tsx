@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -12,24 +11,27 @@ import PeriodicTable from '@/components/PeriodicTable';
 import DiatomicChart from '@/components/DiatomicChart';
 
 function computePair(e1: string, e2: string): string {
-  // Pairs are stored alphabetically: "Ac-H" not "H-Ac"
   return [e1, e2].sort().join('-');
 }
 
-export default function DiatomicsPage() {
+export default function DiatomicViewer() {
   const [element1, setElement1] = useState<string | null>(null);
   const [element2, setElement2] = useState<string | null>(null);
 
   const { index, isLoading: indexLoading } = useDiatomicIndex();
 
+  // Homonuclear: if only one element selected, pair it with itself
   const pair =
-    element1 && element2 ? computePair(element1, element2) : null;
+    element1 && element2
+      ? computePair(element1, element2)
+      : element1
+        ? computePair(element1, element1)
+        : null;
 
   const { curves, isLoading: curvesLoading } = useDiatomicCurves(pair);
 
   function handleSelectElement(symbol: string) {
     if (!element1) {
-      // First selection
       setElement1(symbol);
       setElement2(null);
     } else if (symbol === element1) {
@@ -37,7 +39,6 @@ export default function DiatomicsPage() {
       setElement1(null);
       setElement2(null);
     } else if (!element2) {
-      // Second selection
       setElement2(symbol);
     } else {
       // Both already selected — clicking anything resets to new element1
@@ -47,17 +48,11 @@ export default function DiatomicsPage() {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-          Diatomic Curves
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Select two elements to view and compare diatomic energy curves across all MLIP models.
-          Elements without diatomic data are grayed out. After selecting the first element, only
-          valid pair partners remain enabled.
-        </Typography>
-      </Box>
+    <Box sx={{ p: 2, overflow: 'auto', height: '100%' }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Select one element for homonuclear curves, or two elements for heteronuclear curves.
+        After selecting the first element, only valid pair partners remain enabled.
+      </Typography>
 
       <Paper sx={{ p: 2, mb: 2 }}>
         {indexLoading ? (
@@ -111,7 +106,7 @@ export default function DiatomicsPage() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              Select two elements to view diatomic curves
+              Select an element to view diatomic curves
             </Typography>
           </Box>
         )}
@@ -124,6 +119,6 @@ export default function DiatomicsPage() {
           <DiatomicChart curves={curves} pair={pair} />
         )}
       </Paper>
-    </Container>
+    </Box>
   );
 }

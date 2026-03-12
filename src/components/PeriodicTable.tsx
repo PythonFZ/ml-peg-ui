@@ -73,7 +73,7 @@ export default function PeriodicTable({
     }
   }
 
-  // When element1 selected, compute valid partners
+  // When element1 selected, compute valid partners (including itself for homonuclear)
   const validPartners = new Set<string>();
   if (selectedElement1) {
     for (const key of allPairKeys) {
@@ -84,6 +84,11 @@ export default function PeriodicTable({
         if (a === selectedElement1) validPartners.add(b);
         else if (b === selectedElement1) validPartners.add(a);
       }
+    }
+    // Include self if homonuclear pair exists
+    const homoPair = `${selectedElement1}-${selectedElement1}`;
+    if (allPairKeys.includes(homoPair)) {
+      validPartners.add(selectedElement1);
     }
   }
 
