@@ -39,9 +39,9 @@ updated: 2026-03-12
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 1 | FR-1.2 | unit | `uv run pytest tests/test_api.py::test_benchmark_table_thresholds -x` | ❌ W0 | ⬜ pending |
-| 02-01-02 | 01 | 1 | NFR-1.3 | unit | `uv run pytest tests/test_api.py::test_benchmark_table_cache_headers -x` | ❌ W0 | ⬜ pending |
-| 02-01-03 | 01 | 1 | FR-5.2 | unit | `uv run pytest tests/test_api.py::test_categories -x` | ✅ | ⬜ pending |
+| 02-01-01 | 01 | 1 | FR-1.2 | unit | `uv run pytest tests/test_api.py::test_benchmark_table_thresholds -x` | ✅ | ✅ green |
+| 02-01-02 | 01 | 1 | NFR-1.3 | unit | `uv run pytest tests/test_api.py::test_benchmark_table_cache_headers -x` | ✅ | ✅ green |
+| 02-01-03 | 01 | 1 | FR-5.2 | unit | `uv run pytest tests/test_api.py::test_categories -x` | ✅ | ✅ green |
 | 02-02-01 | 02 | 1 | FR-1.1 | manual | browser: load `/bulk_crystal/elasticity`, count rows | N/A | ⬜ pending |
 | 02-02-02 | 02 | 1 | FR-1.2 | manual | visual: verify color gradient matches viridis_r | N/A | ⬜ pending |
 | 02-02-03 | 02 | 1 | FR-1.6 | manual | visual: find null cells, verify hatched pattern | N/A | ⬜ pending |
@@ -65,8 +65,8 @@ updated: 2026-03-12
 
 ## Wave 0 Requirements
 
-- [ ] `tests/test_api.py::test_benchmark_table_thresholds` — stub for FR-1.2 API thresholds
-- [ ] `tests/test_api.py::test_benchmark_table_cache_headers` — stub for NFR-1.3 cache headers
+- [x] `tests/test_api.py::test_benchmark_table_thresholds` — FR-1.2 API thresholds ✅ green
+- [x] `tests/test_api.py::test_benchmark_table_cache_headers` — NFR-1.3 cache headers ✅ green
 
 *Existing infrastructure covers remaining requirements via manual browser testing.*
 
@@ -124,3 +124,15 @@ Gaps filled by nyquist-auditor:
 | Gaps found | 4 |
 | Resolved | 4 |
 | Escalated | 0 |
+
+## Validation Audit 2026-03-12 (re-audit)
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
+
+- Fixed `test_benchmark_table_response_accepts_data_meta` — updated from `Meta` to `BenchmarkMeta` after Plan 02-01 schema change
+- Updated Wave 0 entries (02-01-01, 02-01-02, 02-01-03) from pending → green (tests exist and pass)
+- Full suite: 76 pytest passed, 41 vitest passed
