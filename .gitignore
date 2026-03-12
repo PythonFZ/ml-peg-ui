@@ -14,3 +14,4 @@ tsconfig.tsbuildinfo
 next-env.d.ts
 current.yaml
 skills-lock.json
+.vercel
