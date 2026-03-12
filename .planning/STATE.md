@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-11T21:39:49.714Z"
+stopped_at: Completed 04-secondary-viewers-01-PLAN.md
+last_updated: "2026-03-12T07:41:44.167Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 13
+  completed_plans: 10
   percent: 100
 ---
 
@@ -55,6 +55,7 @@ Progress: [██████████] 100%
 | Phase 03-figure-drawer P01 | 3 | 2 tasks | 4 files |
 | Phase 03-figure-drawer P02 | 4 | 2 tasks | 9 files |
 | Phase 03-figure-drawer P02 | 10 | 3 tasks | 9 files |
+| Phase 04-secondary-viewers P01 | 5 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,10 @@ Recent decisions affecting current work:
 - [Phase 03-figure-drawer]: Persistent MUI Drawer variant enables swap-in-place figure switching without close/reopen animation
 - [Phase 03-figure-drawer]: filterModel null=all-models (header click) string=single-model (cell click) — parity with ml-peg dual patterns
 - [Phase 03-figure-drawer]: scattergl downgraded to scatter — plotly-basic-dist-min excludes WebGL scatter support
+- [Phase 04-secondary-viewers]: ASE energy extracted from atoms.calc.results['energy'] directly to avoid side effects
+- [Phase 04-secondary-viewers]: PBC detected via string match 'pbc=T T T' on second xyz line — no ASE parsing needed for structure files
+- [Phase 04-secondary-viewers]: Diatomic index cached in app.state.diatomic_index lazily on first request
+- [Phase 04-secondary-viewers]: NEB band matched via endswith suffix -{band}-neb-band.extxyz to handle both hyphen and underscore model name variants
 
 ### Pending Todos
 
@@ -115,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:39:49.711Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-secondary-viewers/04-CONTEXT.md
+Last session: 2026-03-12T07:41:44.165Z
+Stopped at: Completed 04-secondary-viewers-01-PLAN.md
+Resume file: None

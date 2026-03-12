@@ -109,10 +109,10 @@
 | FR-3.3 | Phase 3 | Complete |
 | FR-3.4 | Phase 3 | Complete |
 | NFR-1.4 | Phase 3 | Complete |
-| FR-6.1 | Phase 4 | Pending |
-| FR-6.2 | Phase 4 | Pending |
+| FR-6.1 | Phase 4 | Complete |
+| FR-6.2 | Phase 4 | Complete |
 | FR-6.3 | Phase 4 | Pending |
-| FR-6.4 | Phase 4 | Pending |
+| FR-6.4 | Phase 4 | Complete |
 | FR-2.1 | Phase 5 | Pending |
 | FR-2.2 | Phase 5 | Pending |
 | FR-2.3 | Phase 5 | Pending |
