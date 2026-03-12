@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-secondary-viewers-03-PLAN.md
-last_updated: "2026-03-12T07:46:46.624Z"
+stopped_at: Completed 04-secondary-viewers-02-PLAN.md
+last_updated: "2026-03-12T07:48:23.829Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 13
   percent: 100
 ---
 
@@ -57,6 +57,8 @@ Progress: [██████████] 100%
 | Phase 03-figure-drawer P02 | 10 | 3 tasks | 9 files |
 | Phase 04-secondary-viewers P01 | 5 | 2 tasks | 11 files |
 | Phase 04-secondary-viewers P03 | 2 | 2 tasks | 5 files |
+| Phase 04-secondary-viewers P02 | 4 | 2 tasks | 5 files |
+| Phase 04-secondary-viewers P04 | 12 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -107,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 04-secondary-viewers]: 3Dmol.js imported inside useEffect only — never at module level (SSR incompatible, large bundle)
 - [Phase 04-secondary-viewers]: View Structure button only visible when filterModel is set (specific model selected via cell click)
 - [Phase 04-secondary-viewers]: StructureModal rendered outside Drawer to avoid z-index stacking issues
+- [Phase 04-secondary-viewers]: getPlotlyThemeOverrides inlined in DiatomicChart — two consumers don't justify shared util
+- [Phase 04-secondary-viewers]: Pair alphabetical sort in frontend matches backend key format (Ac-H not H-Ac)
 
 ### Pending Todos
 
@@ -124,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T07:46:46.622Z
-Stopped at: Completed 04-secondary-viewers-03-PLAN.md
+Last session: 2026-03-12T07:48:11.554Z
+Stopped at: Completed 04-secondary-viewers-02-PLAN.md
 Resume file: None

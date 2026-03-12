@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 01.1: Replace ORJSONResponse with Pydantic response models** (INSERTED) (completed 2026-03-10)
 - [ ] **Phase 2: Leaderboard Core** - Color-coded MUI DataGrid with category navigation and CDN caching
 - [ ] **Phase 3: Figure Drawer** - Cell-click Plotly drawer with lazy loading and presigned URL redirect
-- [ ] **Phase 4: Secondary Viewers** - Diatomic curve, 3D structure, NEB trajectory, and phonon viewers
+- [x] **Phase 4: Secondary Viewers** - Diatomic curve, 3D structure, NEB trajectory, and phonon viewers (completed 2026-03-12)
 - [ ] **Phase 5: UX Polish** - Search autocomplete, weight sliders, tooltips, hover cards, onboarding
 
 ## Phase Details
@@ -91,7 +91,7 @@ Plans:
   2. Benchmarks with xyz structure files (10 benchmarks) show a 3D structure viewer that loads the correct structure on demand
   3. The NEB trajectory viewer plays through extxyz multi-frame data for li_diffusion benchmarks
   4. The phonon interactive viewer loads on demand via presigned URL (the 333 MB file is never proxied through Vercel)
-**Plans:** 1/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md — Backend: storage get_bytes, Pydantic models, diatomic/structure/NEB endpoints, tests
@@ -121,5 +121,5 @@ Phases execute in numeric order: 1 -> 01.1 -> 2 -> 3 -> 4 -> 5
 | 01.1. Pydantic Response Models | 1/1 | Complete    | 2026-03-10 |
 | 2. Leaderboard Core | 1/4 | In Progress | - |
 | 3. Figure Drawer | 1/2 | In Progress|  |
-| 4. Secondary Viewers | 1/4 | In Progress|  |
+| 4. Secondary Viewers | 4/4 | Complete   | 2026-03-12 |
 | 5. UX Polish | 0/? | Not started | - |
