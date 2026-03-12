@@ -11,6 +11,7 @@ import { useBenchmarkTable, useBenchmarkFigures } from '@/lib/api';
 import { useFilterContext } from '@/lib/filter-context';
 import { computeScore, type WeightOverrides, type ThresholdOverrides } from '@/lib/score-calc';
 import WeightControls from '@/components/WeightControls';
+import { FaqSection } from '@/components/FaqSection';
 
 // Custom viewer components — lazy loaded since most benchmarks don't need them
 const DiatomicViewer = dynamic(() => import('@/components/DiatomicViewer'), { ssr: false });
@@ -213,7 +214,7 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
             inputProps={{ 'aria-label': 'Filter columns' }}
           />
         </Box>
-        {/* Shared horizontal scroll container for DataGrid + WeightControls */}
+        {/* Shared horizontal scroll container for DataGrid + WeightControls + FAQ */}
         <Box sx={{ flex: 1, overflow: 'auto' }}>
           <Box sx={{ minWidth: totalColumnsWidth }}>
             <LeaderboardTable
@@ -237,6 +238,7 @@ export default function BenchmarkPage({ params }: BenchmarkPageProps) {
               onReset={handleReset}
             />
           </Box>
+          <FaqSection />
         </Box>
         <FigureDrawer
           open={drawerState.open}

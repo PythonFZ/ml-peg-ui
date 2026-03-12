@@ -12,9 +12,12 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useColorScheme } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useRouter } from 'next/navigation';
 import { useCategories, useModels } from '@/lib/api';
 import { useFilterContext } from '@/lib/filter-context';
+import { TutorialModal, useTutorialModal } from '@/components/TutorialModal';
 
 interface BenchmarkOption {
   label: string;
@@ -24,6 +27,7 @@ interface BenchmarkOption {
 export function AppHeader() {
   const { mode, setMode } = useColorScheme();
   const router = useRouter();
+  const { open: tutorialOpen, dismiss: dismissTutorial, reopen: reopenTutorial } = useTutorialModal();
   const { categories } = useCategories();
   const { models } = useModels();
   const { selectedModels, setSelectedModels } = useFilterContext();
@@ -109,6 +113,15 @@ export function AppHeader() {
         />
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Button
+            onClick={reopenTutorial}
+            size="small"
+            color="inherit"
+            startIcon={<HelpOutlineIcon />}
+            sx={{ textTransform: 'none', fontWeight: 400 }}
+          >
+            Tutorial
+          </Button>
           <IconButton
             component="a"
             href="https://github.com/ddmms/ml-peg"
@@ -132,6 +145,7 @@ export function AppHeader() {
           )}
         </Box>
       </Toolbar>
+      <TutorialModal open={tutorialOpen} onClose={dismissTutorial} />
     </AppBar>
   );
 }

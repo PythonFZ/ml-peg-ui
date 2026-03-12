@@ -2,13 +2,13 @@
 
 import { useMemo } from 'react';
 import { DataGrid, type GridColDef, type GridRenderCellParams, type GridSortModel } from '@mui/x-data-grid';
-import { Box, Link, Tooltip } from '@mui/material';
+import { Box, Link, Tooltip, Typography } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import type { MetricsRow, BenchmarkMeta } from '@/lib/types';
 import type { ThresholdOverrides } from '@/lib/score-calc';
 import { normalizeScore, viridisR, textColorForViridis } from '@/lib/color';
 import { formatSigFigs } from '@/lib/format';
-import { MODEL_LINKS } from '@/lib/model-links';
+import { MODEL_LINKS, MODEL_METADATA } from '@/lib/model-links';
 
 interface LeaderboardTableProps {
   rows: MetricsRow[];
@@ -68,17 +68,43 @@ export default function LeaderboardTable({
       sortable: true,
       renderCell: (params: GridRenderCellParams) => {
         const url = MODEL_LINKS[params.row.id];
-        if (url) {
-          return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Link href={url} target="_blank" rel="noopener" underline="hover">
-                {params.value}
-              </Link>
-              <GitHubIcon sx={{ fontSize: 14, opacity: 0.6 }} />
+        const metadata = MODEL_METADATA[params.row.id];
+        const tooltipContent = (
+          <Box sx={{ p: 0.5 }}>
+            <Typography variant="body2" fontWeight={600}>{params.value}</Typography>
+            {metadata?.architecture && (
+              <Typography variant="caption" display="block">Architecture: {metadata.architecture}</Typography>
+            )}
+            {metadata?.params && (
+              <Typography variant="caption" display="block">Parameters: {metadata.params}</Typography>
+            )}
+            {metadata?.training && (
+              <Typography variant="caption" display="block">Training: {metadata.training}</Typography>
+            )}
+            {url && (
+              <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+                {url.includes('huggingface') ? 'HuggingFace' : 'GitHub'}: {url}
+              </Typography>
+            )}
+            {!metadata && !url && (
+              <Typography variant="caption" color="text.secondary">No additional info available</Typography>
+            )}
+          </Box>
+        );
+        return (
+          <Tooltip title={tooltipContent} arrow placement="right" enterDelay={300}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'default' }}>
+              {url ? (
+                <Link href={url} target="_blank" rel="noopener" underline="hover">
+                  {params.value}
+                </Link>
+              ) : (
+                params.value
+              )}
+              {url && <GitHubIcon sx={{ fontSize: 14, opacity: 0.6 }} />}
             </Box>
-          );
-        }
-        return params.value;
+          </Tooltip>
+        );
       },
     };
 
