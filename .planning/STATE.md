@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-12T09:31:46.442Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-03-12T09:38:01.659Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
   percent: 100
 ---
 
@@ -61,6 +61,7 @@ Progress: [██████████] 100%
 | Phase 04-secondary-viewers P04 | 12 | 2 tasks | 6 files |
 | Phase 05-ux-polish P01 | 5 | 2 tasks | 7 files |
 | Phase 05-ux-polish P02 | 5 | 2 tasks | 6 files |
+| Phase 05-ux-polish P03 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase 05-ux-polish]: Column filter resets via useEffect([benchmark]) on benchmark route param change
 - [Phase 05-ux-polish]: computeScore excludes metrics with weight===0 or missing threshold; threshold inputs fire on blur only; WeightControls inside shared scroll container with DataGrid
 - [Phase 05-ux-polish]: SummaryTable manages its own categoryWeights state internally; GridSortModel uses map identity replacement to trigger re-sort
+- [Phase 05-ux-polish]: useTutorialModal reads localStorage only in useEffect — open initializes to false to avoid SSR hydration mismatch
+- [Phase 05-ux-polish]: TutorialModal rendered inside AppBar — self-contained, no prop threading through layout
 
 ### Pending Todos
 
@@ -138,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T09:31:46.439Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-12T09:37:53.147Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
