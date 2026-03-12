@@ -256,6 +256,35 @@ def test_figure_response_validates() -> None:
     assert isinstance(response.data, dict)
 
 
+def test_benchmark_figure_redirect_large_file(test_client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    """GET /api/v1/benchmarks/37conf8/figures/37conf8 returns 307 when file exceeds 4 MB.
+
+    Monkeypatches storage.get_object_size to return >4 MB and storage.presigned_url
+    to return a known URL, then verifies the response is 307 with that URL in Location.
+    """
+    from api.index import app
+
+    _LARGE_SIZE = 5 * 1024 * 1024  # 5 MB > 4 MB threshold
+    _FAKE_PRESIGNED_URL = "https://minio.example.com/bucket/figure_37conf8.json?token=abc123"
+
+    storage = app.state.storage
+
+    monkeypatch.setattr(storage, "get_object_size", lambda path: _LARGE_SIZE)
+    monkeypatch.setattr(storage, "presigned_url", lambda path: _FAKE_PRESIGNED_URL)
+
+    response = test_client.get(
+        "/api/v1/benchmarks/37conf8/figures/37conf8",
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 307, (
+        f"Expected 307 redirect for large figure, got {response.status_code}"
+    )
+    assert response.headers["location"] == _FAKE_PRESIGNED_URL, (
+        f"Expected Location header to be presigned URL, got {response.headers.get('location')}"
+    )
+
+
 def test_benchmark_table_cache_headers(test_client: TestClient) -> None:
     """GET /api/v1/benchmarks/37conf8/table includes Cache-Control header matching CACHE_HEADER."""
     from api.index import CACHE_HEADER
