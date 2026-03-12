@@ -53,14 +53,19 @@ def test_categories_response_accepts_data_meta() -> None:
 
 def test_benchmark_table_response_accepts_data_meta() -> None:
     """BenchmarkTableResponse accepts data+meta shape."""
-    from api.models import BenchmarkRow, BenchmarkTableResponse, Meta
+    from api.models import BenchmarkMeta, BenchmarkRow, BenchmarkTableResponse, ColumnDescriptor
 
+    cols = [
+        ColumnDescriptor(id="id", name="id"),
+        ColumnDescriptor(id="MLIP", name="MLIP"),
+        ColumnDescriptor(id="Score", name="Score"),
+    ]
     resp = BenchmarkTableResponse(
         data=[BenchmarkRow(id="x", MLIP="y", Score=0.9)],
-        meta=Meta(count=1, columns=["id", "MLIP", "Score"]),
+        meta=BenchmarkMeta(count=1, columns=cols),
     )
     assert resp.meta.count == 1
-    assert resp.meta.columns == ["id", "MLIP", "Score"]
+    assert len(resp.meta.columns) == 3
 
 
 def test_models_response_accepts_data_meta() -> None:
