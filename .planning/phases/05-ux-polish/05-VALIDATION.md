@@ -44,6 +44,8 @@ created: 2026-03-12
 | 05-02-01 | 02 | 1 | FR-7.1 | manual + build | `bun run build` | ✅ | ⬜ pending |
 | 05-02-02 | 02 | 1 | FR-7.2 | unit (score-calc) + build | `bun run build` | ✅ | ⬜ pending |
 | 05-02-03 | 02 | 1 | FR-7.3 | manual + build | `bun run build` | ✅ | ⬜ pending |
+| 05-03-01 | 03 | 3 | FR-2.1, FR-7.1 | manual + build | `npx tsc --noEmit` | ✅ | ⬜ pending |
+| 05-03-02 | 03 | 3 | FR-2.1, FR-7.1 | manual + build | `bun run build` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
