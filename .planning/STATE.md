@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-secondary-viewers-01-PLAN.md
-last_updated: "2026-03-12T07:41:44.167Z"
+stopped_at: Completed 04-secondary-viewers-03-PLAN.md
+last_updated: "2026-03-12T07:46:46.624Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
   percent: 100
 ---
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 03-figure-drawer P02 | 4 | 2 tasks | 9 files |
 | Phase 03-figure-drawer P02 | 10 | 3 tasks | 9 files |
 | Phase 04-secondary-viewers P01 | 5 | 2 tasks | 11 files |
+| Phase 04-secondary-viewers P03 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,9 @@ Recent decisions affecting current work:
 - [Phase 04-secondary-viewers]: PBC detected via string match 'pbc=T T T' on second xyz line — no ASE parsing needed for structure files
 - [Phase 04-secondary-viewers]: Diatomic index cached in app.state.diatomic_index lazily on first request
 - [Phase 04-secondary-viewers]: NEB band matched via endswith suffix -{band}-neb-band.extxyz to handle both hyphen and underscore model name variants
+- [Phase 04-secondary-viewers]: 3Dmol.js imported inside useEffect only — never at module level (SSR incompatible, large bundle)
+- [Phase 04-secondary-viewers]: View Structure button only visible when filterModel is set (specific model selected via cell click)
+- [Phase 04-secondary-viewers]: StructureModal rendered outside Drawer to avoid z-index stacking issues
 
 ### Pending Todos
 
@@ -120,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T07:41:44.165Z
-Stopped at: Completed 04-secondary-viewers-01-PLAN.md
+Last session: 2026-03-12T07:46:46.622Z
+Stopped at: Completed 04-secondary-viewers-03-PLAN.md
 Resume file: None
