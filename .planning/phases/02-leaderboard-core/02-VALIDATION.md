@@ -1,10 +1,11 @@
 ---
 phase: 2
 slug: leaderboard-core
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: updated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-03-11
+updated: 2026-03-12
 ---
 
 # Phase 2 — Validation Strategy
@@ -17,11 +18,11 @@ created: 2026-03-11
 
 | Property | Value |
 |----------|-------|
-| **Framework** | pytest 8.x (Python API); no frontend test framework (manual browser testing) |
-| **Config file** | `pyproject.toml` `[tool.pytest.ini_options]` |
+| **Framework** | pytest 8.x (Python API); vitest 4.x (TypeScript unit tests) |
+| **Config file** | `pyproject.toml` `[tool.pytest.ini_options]`; vitest uses package.json defaults |
 | **Quick run command** | `uv run pytest tests/ -x -q` |
-| **Full suite command** | `uv run pytest tests/ -v` |
-| **Estimated runtime** | ~10 seconds |
+| **Full suite command** | `uv run pytest tests/ -v && bunx vitest run src/lib/` |
+| **Estimated runtime** | ~15 seconds |
 
 ---
 
@@ -49,6 +50,10 @@ created: 2026-03-11
 | 02-03-03 | 03 | 1 | FR-4.3 | manual | set dark, reload, verify persisted | N/A | ⬜ pending |
 | 02-04-01 | 04 | 2 | FR-1.3 | manual | click tab, verify URL changes | N/A | ⬜ pending |
 | 02-04-02 | 04 | 2 | FR-5.3 | manual | navigate directly to `/bulk_crystal/elasticity` | N/A | ⬜ pending |
+| 02-03-04 | 03 | 1 | FR-1.5 | unit | `bunx vitest run src/lib/format.test.ts` | ✅ | ✅ green |
+| 02-03-05 | 03 | 1 | FR-1.2 | unit | `bunx vitest run src/lib/color.test.ts` | ✅ | ✅ green |
+| 02-03-06 | 03 | 1 | NFR-4.2 | unit | `bunx vitest run src/lib/color.test.ts` | ✅ | ✅ green |
+| 02-03-07 | 03 | 1 | FR-5.1 | unit | `bunx vitest run src/lib/model-links.test.ts` | ✅ | ✅ green |
 | 02-05-01 | 05 | 2 | FR-5.1 | manual | hover MLIP name, verify GitHub link | N/A | ⬜ pending |
 | 02-06-01 | 06 | 2 | NFR-1.1 | manual | Chrome DevTools Network, measure load time | N/A | ⬜ pending |
 | 02-06-02 | 06 | 2 | NFR-1.2 | manual | Chrome DevTools Performance, measure sort re-render | N/A | ⬜ pending |
@@ -64,6 +69,17 @@ created: 2026-03-11
 - [ ] `tests/test_api.py::test_benchmark_table_cache_headers` — stub for NFR-1.3 cache headers
 
 *Existing infrastructure covers remaining requirements via manual browser testing.*
+
+## Nyquist Gap-Fill Results (2026-03-12)
+
+Gaps filled by nyquist-auditor:
+
+| Gap | Requirement | Test File | Tests | Status |
+|-----|-------------|-----------|-------|--------|
+| FR-1.5 sig fig formatting | `formatSigFigs` null/NaN/Infinity → em-dash, numbers → toPrecision | `src/lib/format.test.ts` | 9 | green |
+| FR-1.2 viridis color pipeline | `normalizeScore` clamp/degenerate, `viridisR` output, `textColorForViridis` colors | `src/lib/color.test.ts` | 19 | green |
+| FR-5.1 GitHub links | `MODEL_LINKS` entries, URL validity, GitHub/HuggingFace domains | `src/lib/model-links.test.ts` | 8 | green |
+| NFR-4.2 WCAG contrast | `textColorForViridis` threshold at 0.4, white below, black above | `src/lib/color.test.ts` | (included above) | green |
 
 ---
 
@@ -90,11 +106,21 @@ created: 2026-03-11
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 10s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 10s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** ✅ compliant
+
+---
+
+## Validation Audit 2026-03-12
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 4 |
+| Resolved | 4 |
+| Escalated | 0 |
