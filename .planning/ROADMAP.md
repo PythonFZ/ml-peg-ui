@@ -108,7 +108,7 @@ Plans:
   2. Typing in the benchmark filter autocomplete narrows the visible columns; multiple benchmarks can be selected simultaneously
   3. Moving a metric weight slider recalculates and updates the Score column in real time without a server round-trip
   4. Category-level weight sliders on the summary view reorder models by adjusted composite score
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 05-01-PLAN.md — Search & filtering: model autocomplete, benchmark quick-search, column filter
@@ -127,4 +127,4 @@ Phases execute in numeric order: 1 -> 01.1 -> 2 -> 3 -> 4 -> 5
 | 2. Leaderboard Core | 1/4 | In Progress | - |
 | 3. Figure Drawer | 1/2 | In Progress|  |
 | 4. Secondary Viewers | 4/4 | Complete   | 2026-03-12 |
-| 5. UX Polish | 0/3 | Not started | - |
+| 5. UX Polish | 1/3 | In Progress|  |

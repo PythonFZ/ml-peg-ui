@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-12T08:56:38.918Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-12T09:24:10.614Z"
 last_activity: "2026-03-10 — Plan 01-02 complete: FastAPI backend with storage abstraction and all Phase 1 endpoints"
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 16
+  completed_plans: 14
   percent: 100
 ---
 
@@ -59,6 +59,7 @@ Progress: [██████████] 100%
 | Phase 04-secondary-viewers P03 | 2 | 2 tasks | 5 files |
 | Phase 04-secondary-viewers P02 | 4 | 2 tasks | 5 files |
 | Phase 04-secondary-viewers P04 | 12 | 2 tasks | 6 files |
+| Phase 05-ux-polish P01 | 5 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 04-secondary-viewers]: NEB model list hardcoded in neb-constants.ts (13 models from data/nebs/li_diffusion/) — no model-listing endpoint; add dynamic endpoint in future
 - [Phase 04-secondary-viewers]: framesToXyz converts NebFrame JSON to multi-frame XYZ for 3Dmol.js addModelsAsFrames
 - [Phase 04-secondary-viewers]: Two separate useEffect hooks in NebStructurePlayer: frames dep for viewer reinit, currentFrame dep for setFrame only
+- [Phase 05-ux-polish]: FilterProvider wraps both AppHeader and children in layout.tsx so both share the same context instance
+- [Phase 05-ux-polish]: columnVisibilityModel controlled by colFilter; onColumnVisibilityModelChange is no-op to prevent DataGrid overwriting controlled state
+- [Phase 05-ux-polish]: Column filter resets via useEffect([benchmark]) on benchmark route param change
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T08:56:38.915Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-ux-polish/05-CONTEXT.md
+Last session: 2026-03-12T09:24:10.611Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None

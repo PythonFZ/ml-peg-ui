@@ -113,9 +113,9 @@
 | FR-6.2 | Phase 4 | Complete |
 | FR-6.3 | Phase 4 | Pending |
 | FR-6.4 | Phase 4 | Complete |
-| FR-2.1 | Phase 5 | Pending |
-| FR-2.2 | Phase 5 | Pending |
-| FR-2.3 | Phase 5 | Pending |
+| FR-2.1 | Phase 5 | Complete |
+| FR-2.2 | Phase 5 | Complete |
+| FR-2.3 | Phase 5 | Complete |
 | FR-7.1 | Phase 5 | Pending |
 | FR-7.2 | Phase 5 | Pending |
 | FR-7.3 | Phase 5 | Pending |
