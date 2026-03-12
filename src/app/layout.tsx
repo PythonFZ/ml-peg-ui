@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import { Providers } from './providers';
 import { AppHeader } from '@/components/AppHeader';
+import { FilterProvider } from '@/lib/filter-context';
 
 export const metadata: Metadata = {
   title: "ML-PEG Leaderboard",
@@ -20,8 +21,10 @@ export default function RootLayout({
         <InitColorSchemeScript />
         <AppRouterCacheProvider>
           <Providers>
-            <AppHeader />
-            {children}
+            <FilterProvider>
+              <AppHeader />
+              {children}
+            </FilterProvider>
           </Providers>
         </AppRouterCacheProvider>
       </body>
