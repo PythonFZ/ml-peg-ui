@@ -102,3 +102,54 @@ def test_storage_does_not_import_orjson() -> None:
                     assert alias.name != "orjson", "orjson found in api/storage.py imports"
             elif isinstance(node, ast.ImportFrom):
                 assert node.module != "orjson", "orjson found in api/storage.py imports"
+
+
+def test_openapi_schema_has_typed_responses() -> None:
+    """OpenAPI schema JSON contains references to all key response model names."""
+    import json
+
+    from api.index import app
+
+    schema = app.openapi()
+    schema_str = json.dumps(schema)
+
+    expected_models = [
+        "HealthResponse",
+        "CategoriesResponse",
+        "BenchmarkTableResponse",
+        "ModelsResponse",
+    ]
+    for model_name in expected_models:
+        assert model_name in schema_str, (
+            f"OpenAPI schema does not reference '{model_name}' — "
+            f"endpoint may be missing a typed return annotation"
+        )
+
+
+def test_no_orjson_in_codebase() -> None:
+    """No .py file under api/ or tests/, and pyproject.toml, contains any 'orjson' reference."""
+    import pathlib
+
+    repo_root = pathlib.Path(__file__).parent.parent
+
+    # Collect all Python files under api/ and tests/
+    # Exclude this file itself — it contains "orjson" in assertion strings intentionally
+    this_file = pathlib.Path(__file__).resolve()
+    py_files = [
+        p for p in list((repo_root / "api").rglob("*.py")) + list((repo_root / "tests").rglob("*.py"))
+        if p.resolve() != this_file
+    ]
+    pyproject = repo_root / "pyproject.toml"
+
+    offending: list[str] = []
+    for path in py_files:
+        text = path.read_text()
+        if "orjson" in text:
+            offending.append(str(path.relative_to(repo_root)))
+
+    if pyproject.exists() and "orjson" in pyproject.read_text():
+        offending.append("pyproject.toml")
+
+    assert not offending, (
+        f"'orjson' found in the following files (must be fully removed): {offending}"
+    )
