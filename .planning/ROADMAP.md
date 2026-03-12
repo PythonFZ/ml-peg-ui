@@ -83,7 +83,7 @@ Plans:
 - [ ] 03-02-PLAN.md — Frontend FigureDrawer with lazy Plotly, cell-click wiring, dark/light theming
 
 ### Phase 4: Secondary Viewers
-**Goal**: Researchers can explore diatomic curves, atomic structures, NEB trajectories, and phonon data from within the UI
+**Goal**: Researchers can explore diatomic curves, atomic structures, and NEB trajectories from within the UI (phonon viewer deferred)
 **Depends on**: Phase 3
 **Requirements**: FR-6.1, FR-6.2, FR-6.3, FR-6.4
 **Success Criteria** (what must be TRUE):
@@ -91,7 +91,13 @@ Plans:
   2. Benchmarks with xyz structure files (10 benchmarks) show a 3D structure viewer that loads the correct structure on demand
   3. The NEB trajectory viewer plays through extxyz multi-frame data for li_diffusion benchmarks
   4. The phonon interactive viewer loads on demand via presigned URL (the 333 MB file is never proxied through Vercel)
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Backend: storage get_bytes, Pydantic models, diatomic/structure/NEB endpoints, tests
+- [ ] 04-02-PLAN.md — Frontend: diatomic curve viewer with periodic table and multi-model overlay
+- [ ] 04-03-PLAN.md — Frontend: 3D structure viewer with 3Dmol.js in figure drawer modal
+- [ ] 04-04-PLAN.md — Frontend: NEB trajectory viewer with 3D animation and energy profile chart
 
 ### Phase 5: UX Polish
 **Goal**: Researchers can filter the leaderboard by model and benchmark, adjust metric weights, and access contextual help
@@ -107,7 +113,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 -> 01.1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -115,5 +121,5 @@ Phases execute in numeric order: 1 → 01.1 → 2 → 3 → 4 → 5
 | 01.1. Pydantic Response Models | 1/1 | Complete    | 2026-03-10 |
 | 2. Leaderboard Core | 1/4 | In Progress | - |
 | 3. Figure Drawer | 1/2 | In Progress|  |
-| 4. Secondary Viewers | 0/? | Not started | - |
+| 4. Secondary Viewers | 0/4 | Not started | - |
 | 5. UX Polish | 0/? | Not started | - |
