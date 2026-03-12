@@ -2,7 +2,7 @@
 phase: 3
 slug: figure-drawer
 status: validated
-nyquist_compliant: partial
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-03-11
 ---
@@ -40,7 +40,7 @@ created: 2026-03-11
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
 | 03-01-01 | 01 | 1 | FR-3.1 | unit | `uv run pytest tests/test_api.py::test_benchmark_figures_index -x` | ✅ | ✅ green |
 | 03-01-02 | 01 | 1 | FR-3.1 | unit | `uv run pytest tests/test_api.py::test_benchmark_figure_json -x` | ✅ | ✅ green |
-| 03-01-03 | 01 | 1 | FR-3.4 | manual | N/A — requires mocking >4MB file | N/A | ⬜ manual-only |
+| 03-01-03 | 01 | 1 | FR-3.4 | unit | `uv run pytest tests/test_api.py::test_benchmark_figure_redirect_large_file -x` | ✅ | ✅ green |
 | 03-02-01 | 02 | 2 | FR-3.1 | manual | N/A — cell click opens drawer | N/A | ✅ verified |
 | 03-02-02 | 02 | 2 | FR-3.2 | manual | N/A — browser devtools check | N/A | ✅ verified |
 | 03-02-03 | 02 | 2 | FR-3.3 | manual | N/A — visual confirmation | N/A | ✅ verified |
@@ -69,7 +69,6 @@ created: 2026-03-11
 | scatter/scattergl figures render | FR-3.3 | Visual correctness | Open drawer for density, violin, parity, confusion matrix figures; verify rendering |
 | Plotly loaded once | NFR-1.4 | Network behavior — requires devtools | Open drawer, close, reopen — verify no second plotly.js fetch in Network tab |
 | Dark/light mode rendering | SC-5 | Visual correctness | Toggle theme, verify chart colors adapt |
-| 307 redirect for >4MB figures | FR-3.4 | Requires mocking large file or real MinIO setup | Serve a figure >4MB, verify 307 response with presigned URL |
 
 ---
 
@@ -80,9 +79,9 @@ created: 2026-03-11
 - [x] Wave 0 covers all automatable references
 - [x] No watch-mode flags
 - [x] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter — partial (1 manual-only escalation)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** validated (partial)
+**Approval:** validated (full)
 
 ---
 
@@ -91,7 +90,7 @@ created: 2026-03-11
 | Metric | Count |
 |--------|-------|
 | Gaps found | 1 |
-| Resolved | 0 |
-| Escalated | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
 
-**Escalated to manual-only:** `test_benchmark_figure_redirect` (FR-3.4) — user chose to skip automated test. 307 redirect logic exists in code but requires mocking a >4MB file or real MinIO backend to test.
+**Resolved:** `test_benchmark_figure_redirect_large_file` (FR-3.4) — automated test added using `monkeypatch` to patch `storage.get_object_size` (returns 5 MB) and `storage.presigned_url` (returns known URL). Test verifies 307 status and correct `Location` header without requiring real large files or MinIO.
