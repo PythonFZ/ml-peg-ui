@@ -5,3 +5,12 @@ node_modules/
 __pycache__/
 .venv/
 *.pyc
+data/
+data.tar.gz
+*.png
+.playwright-cli/
+.agents/
+tsconfig.tsbuildinfo
+next-env.d.ts
+current.yaml
+skills-lock.json

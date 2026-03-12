@@ -1,0 +1,18 @@
+{
+  "workflow": {
+    "_auto_chain_active": false
+  },
+  "researcher_model": "sonnet",
+  "synthesizer_model": "sonnet",
+  "roadmapper_model": "sonnet",
+  "commit_docs": true,
+  "project_type": "greenfield",
+  "tech_stack": {
+    "frontend": "next.js + typescript + mui + plotly",
+    "backend": "fastapi + python",
+    "storage": "minio s3-compatible",
+    "deployment": "vercel",
+    "js_package_manager": "bun",
+    "python_package_manager": "uv"
+  }
+}

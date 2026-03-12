@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, Slider, TextField, Typography } from '@mui/material';
+import { Box, Button, Slider, TextField, Tooltip, Typography } from '@mui/material';
 import type { ColumnDescriptor, Threshold } from '@/lib/types';
 
 export interface WeightControlsProps {
@@ -14,7 +14,12 @@ export interface WeightControlsProps {
   mlipWidth?: number; // default 180
   scoreWidth?: number; // default 100
   metricWidth?: number; // default 110
+  columnVisibilityModel?: Record<string, boolean>;
 }
+
+const WEIGHT_TOOLTIP = 'How much this metric contributes to the overall score (0 = excluded, 1 = full weight)';
+const GOOD_TOOLTIP = 'Threshold for best performance (green). Values at or beyond this are scored 1.0';
+const BAD_TOOLTIP = 'Threshold for worst performance (purple). Values at or beyond this are scored 0.0';
 
 export default function WeightControls({
   columns,
@@ -26,11 +31,17 @@ export default function WeightControls({
   mlipWidth = 180,
   scoreWidth = 100,
   metricWidth = 110,
+  columnVisibilityModel,
 }: WeightControlsProps) {
   // Local state for threshold input text (to avoid re-rendering on every keystroke)
   const [localThresholds, setLocalThresholds] = useState<
     Record<string, { good: string; bad: string }>
   >({});
+
+  // Filter columns by visibility
+  const visibleColumns = columnVisibilityModel
+    ? columns.filter((col) => columnVisibilityModel[col.id] !== false)
+    : columns;
 
   function getGoodStr(colId: string): string {
     if (localThresholds[colId]?.good !== undefined) return localThresholds[colId].good;
@@ -79,82 +90,128 @@ export default function WeightControls({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        pt: 1,
-        pb: 0.5,
         borderTop: 1,
         borderColor: 'divider',
         overflowX: 'visible',
       }}
     >
-      {/* Spacer for MLIP column */}
-      <Box sx={{ minWidth: mlipWidth, width: mlipWidth, flexShrink: 0 }} />
+      {/* Weight row */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          pt: 1,
+          pb: 0.5,
+        }}
+      >
+        {/* Label for MLIP column */}
+        <Tooltip title={WEIGHT_TOOLTIP} arrow>
+          <Box sx={{ minWidth: mlipWidth, width: mlipWidth, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', pl: 1, pr: 0.5, pt: 1 }}>
+            <Typography variant="caption" fontWeight={600}>Weight</Typography>
+            <Button variant="outlined" size="small" onClick={handleReset} sx={{ minWidth: 'auto', px: 1, py: 0, fontSize: '0.7rem' }}>
+              Reset
+            </Button>
+          </Box>
+        </Tooltip>
 
-      {/* Spacer for Score column */}
-      <Box sx={{ minWidth: scoreWidth, width: scoreWidth, flexShrink: 0 }} />
+        {/* Spacer for Score column */}
+        <Box sx={{ minWidth: scoreWidth, width: scoreWidth, flexShrink: 0 }} />
 
-      {/* Per-metric control boxes */}
-      {columns.map((col) => {
-        const weight = weights[col.id] ?? 1;
-        return (
-          <Box
-            key={col.id}
-            sx={{
-              minWidth: metricWidth,
-              width: metricWidth,
-              flexShrink: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              px: 0.5,
-              gap: 0.25,
-            }}
-          >
-            <Slider
-              orientation="vertical"
-              min={0}
-              max={1}
-              step={0.05}
-              size="small"
-              value={weight}
-              sx={{ height: 56 }}
-              aria-label={`${col.name} weight`}
-              onChange={(_e, val) => onWeightChange(col.id, val as number)}
-            />
-            <Typography variant="caption" sx={{ lineHeight: 1.2 }}>
-              {weight.toFixed(2)}
-            </Typography>
+        {/* Per-metric weight sliders */}
+        {visibleColumns.map((col) => {
+          const weight = weights[col.id] ?? 1;
+          return (
+            <Box
+              key={col.id}
+              sx={{
+                minWidth: metricWidth,
+                width: metricWidth,
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                px: 0.5,
+                gap: 0.25,
+              }}
+            >
+              <Slider
+                orientation="vertical"
+                min={0}
+                max={1}
+                step={0.05}
+                size="small"
+                value={weight}
+                sx={{ height: 56 }}
+                aria-label={`${col.name} weight`}
+                onChange={(_e, val) => onWeightChange(col.id, val as number)}
+              />
+              <Typography variant="caption" sx={{ lineHeight: 1.2 }}>
+                {weight.toFixed(2)}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
+
+      {/* Good threshold row */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          pb: 0.5,
+        }}
+      >
+        <Tooltip title={GOOD_TOOLTIP} arrow>
+          <Box sx={{ minWidth: mlipWidth, width: mlipWidth, flexShrink: 0, pl: 1 }}>
+            <Typography variant="caption" fontWeight={600}>Good</Typography>
+          </Box>
+        </Tooltip>
+        <Box sx={{ minWidth: scoreWidth, width: scoreWidth, flexShrink: 0 }} />
+        {visibleColumns.map((col) => (
+          <Box key={col.id} sx={{ minWidth: metricWidth, width: metricWidth, flexShrink: 0, display: 'flex', justifyContent: 'center', px: 0.5 }}>
             <TextField
               type="number"
               size="small"
-              label="G"
               value={getGoodStr(col.id)}
               onChange={(e) => handleGoodChange(col.id, e.target.value)}
               onBlur={() => handleThresholdBlur(col.id)}
-              sx={{ width: 65 }}
+              sx={{ width: 70 }}
               inputProps={{ step: 'any', 'aria-label': `${col.name} good threshold` }}
             />
+          </Box>
+        ))}
+      </Box>
+
+      {/* Bad threshold row */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          pb: 0.5,
+        }}
+      >
+        <Tooltip title={BAD_TOOLTIP} arrow>
+          <Box sx={{ minWidth: mlipWidth, width: mlipWidth, flexShrink: 0, pl: 1 }}>
+            <Typography variant="caption" fontWeight={600}>Bad</Typography>
+          </Box>
+        </Tooltip>
+        <Box sx={{ minWidth: scoreWidth, width: scoreWidth, flexShrink: 0 }} />
+        {visibleColumns.map((col) => (
+          <Box key={col.id} sx={{ minWidth: metricWidth, width: metricWidth, flexShrink: 0, display: 'flex', justifyContent: 'center', px: 0.5 }}>
             <TextField
               type="number"
               size="small"
-              label="B"
               value={getBadStr(col.id)}
               onChange={(e) => handleBadChange(col.id, e.target.value)}
               onBlur={() => handleThresholdBlur(col.id)}
-              sx={{ width: 65 }}
+              sx={{ width: 70 }}
               inputProps={{ step: 'any', 'aria-label': `${col.name} bad threshold` }}
             />
           </Box>
-        );
-      })}
-
-      {/* Reset button */}
-      <Box sx={{ minWidth: 80, display: 'flex', alignItems: 'flex-start', pt: 1, pl: 1 }}>
-        <Button variant="outlined" size="small" onClick={handleReset}>
-          Reset
-        </Button>
+        ))}
       </Box>
     </Box>
   );

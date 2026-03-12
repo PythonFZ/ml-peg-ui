@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -64,6 +65,7 @@ export function AppHeader() {
         <Autocomplete<string, true>
           multiple
           size="small"
+          limitTags={3}
           options={modelOptions}
           value={selectedModels}
           onChange={(_event, newValue) => setSelectedModels(newValue)}
@@ -77,6 +79,11 @@ export function AppHeader() {
               />
             ))
           }
+          getLimitTagsText={(more) => (
+            <Tooltip title={selectedModels.slice(3).join(', ')} arrow>
+              <Chip label={`+${more}`} size="small" />
+            </Tooltip>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}

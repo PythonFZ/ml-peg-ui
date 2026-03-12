@@ -161,13 +161,20 @@ class MinioBackend:
             raise
 
     def list_keys(self, prefix: str) -> list[str]:
-        """List object keys in the bucket under the given prefix."""
+        """List object keys in the bucket under the given prefix.
+
+        Returns basenames (last path segment) to match FilesystemBackend contract.
+        Strips trailing slashes from directory entries.
+        """
+        full_prefix = self._key(prefix) if prefix else self.prefix
+        if full_prefix and not full_prefix.endswith("/"):
+            full_prefix += "/"
         objects = self.client.list_objects(
             self.bucket,
-            prefix=self._key(prefix) if prefix else self.prefix,
+            prefix=full_prefix,
             recursive=False,
         )
-        return [obj.object_name for obj in objects]
+        return [obj.object_name.rstrip("/").rsplit("/", 1)[-1] for obj in objects]
 
     def presigned_url(self, path: str, expires_hours: int = 1) -> str:
         """Return a presigned URL for the given object key."""

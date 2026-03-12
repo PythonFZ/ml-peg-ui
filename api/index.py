@@ -59,7 +59,7 @@ logger = logging.getLogger(__name__)
 CACHE_HEADER = "s-maxage=3600, stale-while-revalidate=86400"
 
 # Categories to skip when scanning the data directory
-_SKIP_CATEGORIES = {"assets"}
+_SKIP_CATEGORIES = {"assets", "onboarding"}
 
 
 def _slugify(name: str) -> str:
@@ -169,8 +169,13 @@ async def benchmark_table(slug: str, request: Request, response: Response) -> Be
     if bench_path is None:
         raise HTTPException(status_code=404, detail=f"Benchmark '{slug}' not found")
 
-    # File path: {category}/{BenchmarkDir}/{slug}_metrics_table.json
-    metrics_file = f"{bench_path}/{slug.lower()}_metrics_table.json"
+    # Find the *_metrics_table.json file in the benchmark directory
+    # Filenames are inconsistent (e.g. gscdb138_metrics_table.json in GSCDB138_field/)
+    bench_keys = storage.list_keys(bench_path)
+    metrics_files = [k for k in bench_keys if k.endswith("_metrics_table.json")]
+    if not metrics_files:
+        raise HTTPException(status_code=404, detail=f"Metrics table not found for '{slug}'")
+    metrics_file = f"{bench_path}/{metrics_files[0]}"
     try:
         payload = storage.get_json(metrics_file)
     except FileNotFoundError:
