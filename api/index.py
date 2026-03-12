@@ -290,8 +290,12 @@ async def models(request: Request, response: Response) -> ModelsResponse:
     model_list: list[dict] = []
 
     for bench_slug, bench_path in slug_map.items():
-        metrics_file = f"{bench_path}/{bench_slug}_metrics_table.json"
         try:
+            bench_keys = storage.list_keys(bench_path)
+            metrics_files = [k for k in bench_keys if k.endswith("_metrics_table.json")]
+            if not metrics_files:
+                continue
+            metrics_file = f"{bench_path}/{metrics_files[0]}"
             payload = storage.get_json(metrics_file)
             rows: list[dict] = payload.get("data", payload) if isinstance(payload, dict) else payload
             for row in rows:

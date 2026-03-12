@@ -133,13 +133,23 @@ class MinioBackend:
         return path
 
     def get_json(self, path: str) -> dict:
-        """Fetch an object from MinIO and parse it as JSON."""
-        response = self.client.get_object(self.bucket, self._key(path))
+        """Fetch an object from MinIO and parse it as JSON.
+
+        Raises FileNotFoundError if the object does not exist.
+        """
+        from minio.error import S3Error  # type: ignore[import-untyped]
+
         try:
-            return json.loads(response.read())
-        finally:
-            response.close()
-            response.release_conn()
+            response = self.client.get_object(self.bucket, self._key(path))
+            try:
+                return json.loads(response.read())
+            finally:
+                response.close()
+                response.release_conn()
+        except S3Error as exc:
+            if exc.code == "NoSuchKey":
+                raise FileNotFoundError(f"No such key: {path}") from exc
+            raise
 
     def get_bytes(self, path: str) -> bytes:
         """Fetch raw bytes for an object from MinIO.
@@ -189,8 +199,15 @@ class MinioBackend:
 
         Raises FileNotFoundError if the object does not exist.
         """
-        stat = self.client.stat_object(self.bucket, self._key(path))
-        return stat.size
+        from minio.error import S3Error  # type: ignore[import-untyped]
+
+        try:
+            stat = self.client.stat_object(self.bucket, self._key(path))
+            return stat.size
+        except S3Error as exc:
+            if exc.code == "NoSuchKey":
+                raise FileNotFoundError(f"No such key: {path}") from exc
+            raise
 
 
 def create_storage() -> StorageBackend:
